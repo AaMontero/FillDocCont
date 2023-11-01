@@ -8,9 +8,21 @@
 
 <body>
     <?php
+
+    use PhpOffice\PhpWord\TemplateProcessor;
+
     include("conexion.php");
     require 'vendor/autoload.php'; //Librería para cargar documentos de word
-    //Se busca dentro de la base de datos el mayor numero de contacto 
+    $content = "";
+    $templateWord = new TemplateProcessor("Contrato.docx");
+    $templateWord->setValue('edit_numero_cedula', '0000000000');
+    $pathToSave = 'docs/documentoEditado2.docx';
+    $templateWord->saveAs($pathToSave);
+    
+    echo $content;
+
+
+    //Se busca dent ro de la base de datos el mayor numero de contacto 
     $consulta = "SELECT MAX(id) AS max_numero FROM contratos"; //Consulta SQL 
     $resultado = $conexion->query($consulta); //Se almacena lo obtenido en una variable 
     if ($resultado) {
@@ -19,7 +31,7 @@
         $numero_sucesivo = $fila['max_numero'] + 1;
     } else {
         $numero_sucesivo = 1; // Si no hay contratos en la base de datos
-        echo("No existe el resultado"); 
+        echo ("No existe el resultado");
     }
     $nombres = $email = $apellidos = $ciudad =  "";
     $cedula = "";
@@ -27,7 +39,7 @@
     $fecha_actual = date("Y-m-d");
     // Variable para rastrear errores
     $errorNombres = "";
-    $errorCedula = ""; 
+    $errorCedula = "";
     $errorApellidos = "";
     $errorCiudad = "";
     $errorCorreo = "";
@@ -40,10 +52,10 @@
         $valida = (strlen($numCedula) == 10 && strlen($nombres) > 3 && strlen($apellidos) > 3 && strlen($ciudad) > 3 && strpos($email, "@") !== false);
         if ($valida) {
             $cedula = $numCedula;
-            $contrato = "QR" . $numero_sucesivo . $ciudad;
+            $contrato = "QT" . $numero_sucesivo . $ciudad;
             $nombre_cliente = $nombres . " " . $apellidos;
-            $insercion = "INSERT INTO contratos (ciudad, nombre, fecha) 
-                         VALUES ('$ciudad', '$nombre_cliente', '$fecha_actual')";
+            $insercion = "INSERT INTO contratos (ciudad, nombre, fecha)     
+                VALUES ('$ciudad', '$nombre_cliente', '$fecha_actual')";
 
             if ($conexion->query($insercion) === TRUE) {
                 echo "Contrato creado exitosamente con numero: " . $contrato;
@@ -82,8 +94,8 @@
     }
     ?>
 
-    <h2 class ="tituloH2">Formulario para Contratos</h2>
-    <form class = "formularioBox" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+    <h2 class="tituloH2">Formulario para Contratos</h2>
+    <form class="formularioBox" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
         Nombres: <input type="text" name="nombres" value="<?php echo $nombres; ?>">
         <?php if (!empty($errorNombres)) {
             echo "<span style='color: red;'>$errorNombres</span>";
@@ -111,8 +123,8 @@
         } ?>
         <br><br>
         <!--Aqui esta el botón para ejecutar el código-->
-        <div class ="divBoton">
-        <input type="submit" name="submit" value="Generar Documentos">
+        <div class="divBoton">
+            <input type="submit" name="submit" value="Generar Documentos">
         </div>
     </form>
 </body>
