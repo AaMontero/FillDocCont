@@ -8,6 +8,23 @@
 
 <body>
     <?php
+    // Cedula -> edit_numero_cedula 
+    // Nombres y apellidos -> edit_nombres_apellidos 
+    // RUC -> edit_RUC
+    // fechaActual -> edit_fecha_contrato
+    // ciudad -> edit_ciudad
+    // correo -> edit_email 
+    // contrato -> edit_contrato_id
+    // lugar de la sala -> edit_sala_lugar
+    // numero de cliente -> edit_num_cliente
+    // años del contrato -> edit_anios_contrato
+    // monto del contrato -> edit_monto_contrato 
+    // forma de pago(Varias) -> edit_forma_pago
+    // pagare -> edit_pagaré 
+    // fecha en texto -> edit_fecha_texto 
+    // fecha vencimiento -> edit_fecha_vencimiento 
+    // monto pagaré -> edit_monto_pagare 
+    // numero de cuotas -> edit_num_cuotas
 
     use PhpOffice\PhpWord\TemplateProcessor;
 
@@ -15,12 +32,10 @@
     require 'vendor/autoload.php'; //Librería para cargar documentos de word
     $content = "";
     $templateWord = new TemplateProcessor("Contrato.docx");
-    $templateWord->setValue('edit_numero_cedula', '0000000000');
+    $templateWord->setValue('edit_numero_cedula', '0000000000'); 
+    
     $pathToSave = 'docs/documentoEditado2.docx';
     $templateWord->saveAs($pathToSave);
-    
-    echo $content;
-
 
     //Se busca dent ro de la base de datos el mayor numero de contacto 
     $consulta = "SELECT MAX(id) AS max_numero FROM contratos"; //Consulta SQL 
