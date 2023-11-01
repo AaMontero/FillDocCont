@@ -8,25 +8,27 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="login-container">
+    <img src="img/logo.png" alt="logo">
+    <form action="send.php" method="post" autocomplete="off">
+        <div class="input-group" >    
+            <div class="input-container">
+                <input type="text" placeholder="Nombre" name="usuario">
+                <i class="fa-solid fa-user"></i>
+            </div>
 
-<form action="send.php" method="post" autocomplete="off">
-<img src="logo.png" alt="">
-        
-   <div class="input-group" >    
-    <div class="input-container">
-        <input type="text" placeholder="Nombre" name="usuario">
-        <i class="fa-solid fa-user"></i>
-    </div>
+            <div class="input-container">
+                <input type="password" placeholder="Password" name="clave">
+                <i class="fa-solid fa-lock"></i>
+            </div>
 
-    <div class="input-container">
-        <input type="password" placeholder="Password" name="clave">
-        <i class="fa-solid fa-lock"></i>
-    </div>
-   
-        <input class="btn" type="submit" value="Ingresar">
-   </div>
+            <input class="btn" type="submit" value="Ingresar">
+        </div>
     
-</form>
+    </form>
+
+</div>     
+
 
 </body>
 </html>

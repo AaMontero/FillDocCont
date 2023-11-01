@@ -7,7 +7,7 @@ session_start();
 $_SESSION['usuario']=$usuario;
 
 
-$conexion=mysqli_connect("localhost","root","","contratosdb");
+//$conexion=mysqli_connect("localhost","root","","contratosdb");
 
 $consulta="SELECT*FROM login where usuario='$usuario' and clave='$clave'";
 $resultado=mysqli_query($conexion,$consulta);
