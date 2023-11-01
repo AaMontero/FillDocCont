@@ -5,15 +5,9 @@ $usuario=$_POST['usuario'];
 $clave=$_POST['clave'];
 session_start();
 $_SESSION['usuario']=$usuario;
-
-
-$conexion=mysqli_connect("localhost","root","","contratosdb");
-
-$consulta="SELECT*FROM login where usuario='$usuario' and clave='$clave'";
+$consulta="SELECT * FROM login where usuario='$usuario' and clave='$clave'";
 $resultado=mysqli_query($conexion,$consulta);
-
 $filas=mysqli_num_rows($resultado);
-
 if($filas){
     header("location:index.php");
 }else{

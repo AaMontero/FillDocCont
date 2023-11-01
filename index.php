@@ -2,16 +2,14 @@
 <html>
 
 <head>
-    <title>Formulario PHP</title>
+    <title class="titulo">Formulario PHP</title>
+    <link rel="stylesheet" href="style_formulario.css">
 </head>
 
 <body>
     <?php
-    //Establecer la conexión con la base de datos. 
-    $conexion = new mysqli("localhost", "root", "", "contratosdb");
-    if ($conexion->connect_error) {
-        die("Conexión a la base de datos fallida: " . $conexion->connect_error);
-    }
+    include("conexion.php");
+    require 'vendor/autoload.php'; //Librería para cargar documentos de word
     //Se busca dentro de la base de datos el mayor numero de contacto 
     $consulta = "SELECT MAX(id) AS max_numero FROM contratos"; //Consulta SQL 
     $resultado = $conexion->query($consulta); //Se almacena lo obtenido en una variable 
@@ -33,20 +31,17 @@
     $errorApellidos = "";
     $errorCiudad = "";
     $errorCorreo = "";
-
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $nombres = test_input($_POST["nombres"]);
         $email = test_input($_POST["email"]);
         $apellidos = test_input($_POST["apellidos"]);
         $ciudad = test_input($_POST["ciudad"]);
         $numCedula = test_input($_POST["cedula"]);
-
         $valida = (strlen($numCedula) == 10 && strlen($nombres) > 3 && strlen($apellidos) > 3 && strlen($ciudad) > 3 && strpos($email, "@") !== false);
         if ($valida) {
             $cedula = $numCedula;
             $contrato = "QR" . $numero_sucesivo . $ciudad;
             $nombre_cliente = $nombres . " " . $apellidos;
-
             $insercion = "INSERT INTO contratos (ciudad, nombre, fecha) 
                          VALUES ('$ciudad', '$nombre_cliente', '$fecha_actual')";
 
@@ -87,8 +82,8 @@
     }
     ?>
 
-    <h2>Formulario para Contratos</h2>
-    <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+    <h2 class ="tituloH2">Formulario para Contratos</h2>
+    <form class = "formularioBox" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
         Nombres: <input type="text" name="nombres" value="<?php echo $nombres; ?>">
         <?php if (!empty($errorNombres)) {
             echo "<span style='color: red;'>$errorNombres</span>";
@@ -116,7 +111,9 @@
         } ?>
         <br><br>
         <!--Aqui esta el botón para ejecutar el código-->
-        <input type="submit" name="submit" value="Enviar">
+        <div class ="divBoton">
+        <input type="submit" name="submit" value="Generar Documentos">
+        </div>
     </form>
 </body>
 
