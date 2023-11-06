@@ -25,19 +25,22 @@
     // fecha vencimiento -> edit_fecha_vencimiento 
     // monto pagaré -> edit_monto_pagare 
     // numero de cuotas -> edit_num_cuotas
-
+    // monto de cada cuota -> edit_monto_cuota_pagare
+    // bono hospedaje -> edit_bono_hospedaje
+    // bono hospedaje internacional -> edit_bono_hospedaje_intern
+    // monto texto del pagare -> edit_monto_pagare_text
+    
     use PhpOffice\PhpWord\TemplateProcessor;
 
     include("conexion.php");
     require 'vendor/autoload.php'; //Librería para cargar documentos de word
     $content = "";
     $templateWord = new TemplateProcessor("Contrato.docx");
-    $templateWord->setValue('edit_numero_cedula', '0000000000'); 
-    
+    $templateWord->setValue('edit_numero_cedula', '0000000000');
     $pathToSave = 'docs/documentoEditado2.docx';
     $templateWord->saveAs($pathToSave);
 
-    //Se busca dent ro de la base de datos el mayor numero de contacto 
+    //Se busca dentro de la base de datos el mayor numero de contacto 
     $consulta = "SELECT MAX(id) AS max_numero FROM contratos"; //Consulta SQL 
     $resultado = $conexion->query($consulta); //Se almacena lo obtenido en una variable 
     if ($resultado) {
@@ -48,16 +51,12 @@
         $numero_sucesivo = 1; // Si no hay contratos en la base de datos
         echo ("No existe el resultado");
     }
-    $nombres = $email = $apellidos = $ciudad =  "";
-    $cedula = "";
-    $contrato = "";
-    $fecha_actual = date("Y-m-d");
+    $nombres = $email = $apellidos = $ciudad = $ubicacionSala = $cedula = $contrato ="";
+    $aniosContrato = $montoContrato = 0; 
+    $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = false ; 
+    $fechaActual = $fechaVencimiento = date("Y-m-d");
     // Variable para rastrear errores
-    $errorNombres = "";
-    $errorCedula = "";
-    $errorApellidos = "";
-    $errorCiudad = "";
-    $errorCorreo = "";
+    $errorNombres = $errorCedula = $errorApellidos = $errorUbicacionSala =  $errorCiudad = $errorCorreo = $erroraniosContrato = $errorMontoContrato = "";
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $nombres = test_input($_POST["nombres"]);
         $email = test_input($_POST["email"]);
@@ -70,7 +69,7 @@
             $contrato = "QT" . $numero_sucesivo . $ciudad;
             $nombre_cliente = $nombres . " " . $apellidos;
             $insercion = "INSERT INTO contratos (ciudad, nombre, fecha)     
-                VALUES ('$ciudad', '$nombre_cliente', '$fecha_actual')";
+                VALUES ('$ciudad', '$nombre_cliente', '$fechaActual')";
 
             if ($conexion->query($insercion) === TRUE) {
                 echo "Contrato creado exitosamente con numero: " . $contrato;
@@ -94,12 +93,20 @@
             if (strlen($cedula) !== 10) {
                 $errorCedula = "El formato del correo ingresado no es válido";
             }
+            if (strlen($ubicacionSala)<=3){
+                $errorUbicacionSala = "La ubicación debe contener al menos 3 caracteres"; 
+            }
+            if (($aniosContrato ==0)){
+                $erroraniosContrato = "Ingrese la cantidad de años del contrato"; 
+            }
+            if ($montoContrato == 0){
+                $errorMontoContrato = "Ingrese el monto del contrato"; 
+            }
         }
     }
 
 
     $conexion->close();
-
     function test_input($data)
     {
         $data = trim($data);
@@ -137,11 +144,60 @@
             echo "<span style='color: red;'>$errorCiudad</span>";
         } ?>
         <br><br>
-        <!--Aqui esta el botón para ejecutar el código-->
+
+        <!-- Ubicacion de la sala -->
+        Ubicación de la sala: <input type="text" name="ubicacion_sala" value = "<?php echo $ubicacionSala; ?>">
+        <?php if (!empty($errorUbicacionSala)) {
+            echo "<span style='color: red;'>$errorUbicacionSala</span>";
+        } ?>
+        <br><br>
+
+        <!-- Años del contrato -->
+        Años del contrato: <input type="number" name="anios_contrato" value = "<?php echo $aniosContrato; ?>">
+        <?php if (!empty($erroraniosContrato)) {
+            echo "<span style='color: red;'>$erroraniosContrato</span>";
+        } ?>
+        <br><br>
+
+        <!-- Monto del contrato -->
+        Monto del contrato: <input type="number" name="monto_contrato" value = "<?php echo $montoContrato; ?>">
+        <?php if (!empty($errorMontoContrato)) {
+            echo "<span style='color: red;'>$errorMontoContrato</span>";
+        } ?>
+        <br><br>
+
+        <!-- Forma de pago (añadir más de una) -->
+        Forma de pago:
+        <br>
+        <input type="checkbox" name="forma_pago[]" value= "<?php echo $pagareBoolean; ?>" id="pagareCheckbox"> Pagare <br>
+        <input type="checkbox" name="forma_pago[]" value= "<?php echo $otroFormaPagoBoolean; ?>" id="otroCheckbox"> Otro (Tipo, Cantidad) <br>
+        <br>
+
+        <!-- Campos adicionales para "Pagare" -->
+        <?php
+        if (isset($_POST['forma_pago']) && in_array('pagare', $_POST['forma_pago'])) {
+            echo 'Monto: <input type="text" name="monto_pagare"><br>';
+            echo 'Fecha: <input type="text" name="fecha_pagare"><br>';
+        }
+        ?>
+        <!-- Fecha de vencimiento -->
+        Fecha de vencimiento: <input type="date" name="fecha_vencimiento" value= "<?php echo $fechaVencimiento; ?>" >
+        <br><br>
+
+        <!-- Bono hospedaje Qory Loyalty -->
+        Bono hospedaje Qory Loyalty: <input type="checkbox" name="bono_hospedaje" value= "<?php echo $bonoQory; ?>">
+        <br><br>
+
+        <!-- Bono de hospedaje internacional Qory Loyalty -->
+        Bono de hospedaje internacional Qory Loyalty: <input type="checkbox" name="bono_hospedaje_internacional" value= "<?php echo $bonoQoryInt; ?>">
+        <br><br>
+
+        <!-- Aquí está el botón para ejecutar el código -->
         <div class="divBoton">
             <input type="submit" name="submit" value="Generar Documentos">
         </div>
     </form>
+
 </body>
 
 </html>
