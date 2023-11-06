@@ -29,16 +29,13 @@
     // bono hospedaje -> edit_bono_hospedaje
     // bono hospedaje internacional -> edit_bono_hospedaje_intern
     // monto texto del pagare -> edit_monto_pagare_text
-    
+
     use PhpOffice\PhpWord\TemplateProcessor;
 
     include("conexion.php");
     require 'vendor/autoload.php'; //Librería para cargar documentos de word
     $content = "";
-    $templateWord = new TemplateProcessor("Contrato.docx");
-    $templateWord->setValue('edit_numero_cedula', '0000000000');
-    $pathToSave = 'docs/documentoEditado2.docx';
-    $templateWord->saveAs($pathToSave);
+
 
     //Se busca dentro de la base de datos el mayor numero de contacto 
     $consulta = "SELECT MAX(id) AS max_numero FROM contratos"; //Consulta SQL 
@@ -103,6 +100,10 @@
                 $errorMontoContrato = "Ingrese el monto del contrato"; 
             }
         }
+        $templateWord = new TemplateProcessor("docs/Contrato de agencia de viajes_QORIT.docx");
+        $templateWord->setValue('edit_contrato_id', $contrato);
+        $pathToSave = 'nuevosDocumentos/contratoEditado.docx';
+        $templateWord->saveAs($pathToSave);
     }
 
 
