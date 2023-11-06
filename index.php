@@ -29,9 +29,12 @@
     // bono hospedaje -> edit_bono_hospedaje
     // bono hospedaje internacional -> edit_bono_hospedaje_intern
     // monto texto del pagare -> edit_monto_pagare_text
+    // Texto para el check 16 -> edit_texto_bono_hospedaje
+    // Texto para el check 17 -> edit_texto_bono_int_hospedaje
 
     use PhpOffice\PhpWord\TemplateProcessor;
 
+    include("metodos.php");
     include("conexion.php");
     require 'vendor/autoload.php'; //Librería para cargar documentos de word
     $content = "";
@@ -48,9 +51,9 @@
         $numero_sucesivo = 1; // Si no hay contratos en la base de datos
         echo ("No existe el resultado");
     }
-    $nombres = $email = $apellidos = $ciudad = $ubicacionSala = $cedula = $contrato ="";
-    $aniosContrato = $montoContrato = 0; 
-    $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = false ; 
+    $nombres = $email = $apellidos = $ciudad = $ubicacionSala = $cedula = $contrato = "";
+    $aniosContrato = $montoContrato = 0;
+    $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = false;
     $fechaActual = $fechaVencimiento = date("Y-m-d");
     // Variable para rastrear errores
     $errorNombres = $errorCedula = $errorApellidos = $errorUbicacionSala =  $errorCiudad = $errorCorreo = $erroraniosContrato = $errorMontoContrato = "";
@@ -63,13 +66,13 @@
         $valida = (strlen($numCedula) == 10 && strlen($nombres) > 3 && strlen($apellidos) > 3 && strlen($ciudad) > 3 && strpos($email, "@") !== false);
         if ($valida) {
             $cedula = $numCedula;
-            $contrato = "QT" . $numero_sucesivo . $ciudad;
+            $contrato = "QT" . $ciudad;
             $nombre_cliente = $nombres . " " . $apellidos;
             $insercion = "INSERT INTO contratos (ciudad, nombre, fecha)     
                 VALUES ('$ciudad', '$nombre_cliente', '$fechaActual')";
 
             if ($conexion->query($insercion) === TRUE) {
-                echo "Contrato creado exitosamente con numero: " . $contrato;
+                //echo "Contrato creado exitosamente con numero: " . $contrato;
             } else {
                 echo "Error al crear el contrato: " . $conexion->error;
             }
@@ -90,20 +93,33 @@
             if (strlen($cedula) !== 10) {
                 $errorCedula = "El formato del correo ingresado no es válido";
             }
-            if (strlen($ubicacionSala)<=3){
-                $errorUbicacionSala = "La ubicación debe contener al menos 3 caracteres"; 
+            if (strlen($ubicacionSala) <= 3) {
+                $errorUbicacionSala = "La ubicación debe contener al menos 3 caracteres";
             }
-            if (($aniosContrato ==0)){
-                $erroraniosContrato = "Ingrese la cantidad de años del contrato"; 
+            if (($aniosContrato == 0)) {
+                $erroraniosContrato = "Ingrese la cantidad de años del contrato";
             }
-            if ($montoContrato == 0){
-                $errorMontoContrato = "Ingrese el monto del contrato"; 
+            if ($montoContrato == 0) {
+                $errorMontoContrato = "Ingrese el monto del contrato";
             }
         }
-        $templateWord = new TemplateProcessor("docs/Contrato de agencia de viajes_QORIT.docx");
-        $templateWord->setValue('edit_contrato_id', $contrato);
-        $pathToSave = 'nuevosDocumentos/contratoEditado.docx';
-        $templateWord->saveAs($pathToSave);
+        $okBono = isset($_POST['bono_hospedaje']);
+        if ($okBono == 1) {
+            $bonoQory = true;
+        } else {
+            $bonoQory = false;
+        }
+        $okBonoInt = isset($_POST['bono_hospedaje_internacional']); 
+        if($okBonoInt == 1){
+            $bonoQoryInt = true;
+        }else{
+            $bonoQoryInt = false;
+        }
+
+        $funciones = new DocumentGenerator();
+        $funciones->generarDiferimiento($contrato, $numero_sucesivo, $ciudad, $numCedula, $fechaActual, $nombre_cliente);
+        $funciones->generarVerificacion($nombre_cliente, $numero_sucesivo, $numCedula);
+        $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt);
     }
 
 
@@ -147,21 +163,21 @@
         <br><br>
 
         <!-- Ubicacion de la sala -->
-        Ubicación de la sala: <input type="text" name="ubicacion_sala" value = "<?php echo $ubicacionSala; ?>">
+        Ubicación de la sala: <input type="text" name="ubicacion_sala" value="<?php echo $ubicacionSala; ?>">
         <?php if (!empty($errorUbicacionSala)) {
             echo "<span style='color: red;'>$errorUbicacionSala</span>";
         } ?>
         <br><br>
 
         <!-- Años del contrato -->
-        Años del contrato: <input type="number" name="anios_contrato" value = "<?php echo $aniosContrato; ?>">
+        Años del contrato: <input type="number" name="anios_contrato" value="<?php echo $aniosContrato; ?>">
         <?php if (!empty($erroraniosContrato)) {
             echo "<span style='color: red;'>$erroraniosContrato</span>";
         } ?>
         <br><br>
 
         <!-- Monto del contrato -->
-        Monto del contrato: <input type="number" name="monto_contrato" value = "<?php echo $montoContrato; ?>">
+        Monto del contrato: <input type="number" name="monto_contrato" value="<?php echo $montoContrato; ?>">
         <?php if (!empty($errorMontoContrato)) {
             echo "<span style='color: red;'>$errorMontoContrato</span>";
         } ?>
@@ -170,8 +186,8 @@
         <!-- Forma de pago (añadir más de una) -->
         Forma de pago:
         <br>
-        <input type="checkbox" name="forma_pago[]" value= "<?php echo $pagareBoolean; ?>" id="pagareCheckbox"> Pagare <br>
-        <input type="checkbox" name="forma_pago[]" value= "<?php echo $otroFormaPagoBoolean; ?>" id="otroCheckbox"> Otro (Tipo, Cantidad) <br>
+        <input type="checkbox" name="forma_pago[]" value="<?php echo $pagareBoolean; ?>" id="pagareCheckbox"> Pagare <br>
+        <input type="checkbox" name="forma_pago[]" value="<?php echo $otroFormaPagoBoolean; ?>" id="otroCheckbox"> Otro (Tipo, Cantidad) <br>
         <br>
 
         <!-- Campos adicionales para "Pagare" -->
@@ -182,16 +198,18 @@
         }
         ?>
         <!-- Fecha de vencimiento -->
-        Fecha de vencimiento: <input type="date" name="fecha_vencimiento" value= "<?php echo $fechaVencimiento; ?>" >
+        Fecha de vencimiento: <input type="date" name="fecha_vencimiento" value="<?php echo $fechaVencimiento; ?>">
         <br><br>
 
         <!-- Bono hospedaje Qory Loyalty -->
-        Bono hospedaje Qory Loyalty: <input type="checkbox" name="bono_hospedaje" value= "<?php echo $bonoQory; ?>">
+        Bono hospedaje Qory Loyalty: <input type="checkbox" name="bono_hospedaje" id="bono_hospedaje_checkbox" value="1">
+
         <br><br>
 
         <!-- Bono de hospedaje internacional Qory Loyalty -->
-        Bono de hospedaje internacional Qory Loyalty: <input type="checkbox" name="bono_hospedaje_internacional" value= "<?php echo $bonoQoryInt; ?>">
+        Bono de hospedaje internacional Qory Loyalty: <input type="checkbox" name="bono_hospedaje_internacional" id="bono_hospedaje_internacional_checkbox" value="<?php echo $bonoQoryInt ?>">
         <br><br>
+
 
         <!-- Aquí está el botón para ejecutar el código -->
         <div class="divBoton">
