@@ -52,3 +52,11 @@ input[type="submit"] {
     border-radius: 5px;
     cursor: pointer;
 }
+.div_pagare{
+    align-items: center;
+    display: flex;
+    background-color: blue;
+}
+.formularioBox .pagare{
+    background-color: green;
+}

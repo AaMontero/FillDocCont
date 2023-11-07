@@ -46,8 +46,6 @@ class DocumentGenerator {
 
     public function generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt ){
         $nombre_cliente = strtoupper($nombre_cliente);
-        echo ("Valor Qori Cond 1: " . $bonoQory);
-        echo ("Valor Qori COnd 2: " . $bonoQoryInt);
         $titulo_bono = "16. BONO DE HOSPEDAJE QORY LOYALTY: ";
         $texto_bono= "Acepto y recibo UN Bono de Hospedaje 3 Noches 2 Días para 06 personas. Previo pago de Impuestos. Uso exclusivo en departamentos de la compañía. No incluye ningún tipo de alimentación"; 
         $titulo_bonoInt = "17. BONO DE HOSPEDAJE INTERNACIONAL QORY LOYALTY: ";
@@ -57,15 +55,12 @@ class DocumentGenerator {
         $templateWord->setValue('edit_contrato_id', $contrato);
         $templateWord->setValue('edit_numero_cedula', $numCedula);
         $templateWord->setValue('edit_num_cliente', $numero_sucesivo);
-        if($bonoQory){
+        if($bonoQory&&!$bonoQoryInt){
             $templateWord->setValue('edit_bono_hospedaje', $titulo_bono);
             $templateWord->setValue('edit_texto_bono_hospedaje', $texto_bono);
-            
-        }else{
-            $templateWord->setValue('edit_bono_hospedaje', "");
-            $templateWord->setValue('edit_texto_bono_hospedaje', "");
-        }
-        if($bonoQoryInt){
+            $templateWord->setValue('edit_bono_hospedaje_intern', "");
+            $templateWord->setValue('edit_texto_bono_hospedaje_intern', "");    
+        }else if(($bonoQoryInt&&$bonoQory)||($bonoQoryInt&&!$bonoQory)){
             $templateWord->setValue('edit_bono_hospedaje_intern', $titulo_bonoInt);
             $templateWord->setValue('edit_texto_bono_hospedaje_intern', $texto_bonoInt);
             $templateWord->setValue('edit_bono_hospedaje', $titulo_bono);
@@ -75,25 +70,37 @@ class DocumentGenerator {
             $templateWord->setValue('edit_texto_bono_hospedaje_intern', "");
             $templateWord->setValue('edit_bono_hospedaje', "");
             $templateWord->setValue('edit_texto_bono_hospedaje', "");
-
         }
         $pathToSave = 'nuevosDocumentos/Anexo3Editado'. $numero_sucesivo .'.docx';
         $templateWord->saveAs($pathToSave);
-
-
     }
 
     public function generarContrato() {
-
         $templateWord = new TemplateProcessor("docs/Contrato de agencia de viajes_QORIT.docx");
     }
-
     public function generarPagare(){
         $templateWord = new TemplateProcessor("docs/PAGARE QORIT.docx");
     }
 
-    public function generarCheckList(){
+    public function generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula,$email, $fechaActual, $nombre_cliente, $ubicacionSala){
+        $nombre_cliente = strtoupper($nombre_cliente);
+        $ubicacionSala = strtoupper($ubicacionSala); 
+        global $meses;
+        list($ano, $mes, $dia) = explode('-', $fechaActual);
+        $fechaFormateada = $dia. " de " . $meses[intval($mes)] . " del ". $ano; 
         $templateWord = new TemplateProcessor("docs/CHECK LIST QORIT.docx");
+        $templateWord ->setValue('edit_contrato_id', $contrato); 
+        $templateWord ->setValue('edit_num_cliente', $numero_sucesivo); 
+        $templateWord ->setValue('edit_ciudad', $ciudad);
+        $templateWord ->setValue('edit_provincia', $provincia);  
+        $templateWord ->setValue('edit_fecha_contrato', $fechaActual); 
+        $templateWord ->setValue('edit_nombres_apellidos', $nombre_cliente); 
+        $templateWord ->setValue('edit_numero_cedula', $numCedula); 
+        $templateWord ->setValue('edit_sala_lugar', $ubicacionSala); 
+        $templateWord ->setValue('edit_email', $email); 
+        $templateWord ->setValue('edit_fecha_texto', $fechaFormateada); 
+        $pathToSave = 'nuevosDocumentos/checkListEditado'. $numero_sucesivo .'.docx';
+        $templateWord->saveAs($pathToSave);
     }
 
 
