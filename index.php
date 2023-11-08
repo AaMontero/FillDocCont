@@ -10,24 +10,38 @@
 
 
     <script>
+        var listaFormasPago = [];
 
-        var listaFormasPago = []; 
         function functionAgregar() {
-            event.preventDefault(); 
-            const valor = document.getElementById("monto_forma_pago"); 
-            const valorValue = valor.value; 
-            const forma = document.getElementById("forma_pago"); 
-            const formaValue = forma.value; 
-            var cadena = "$"+ valorValue +" con "+ formaValue; 
+            event.preventDefault();
+            const valor = document.getElementById("monto_forma_pago");
+            const valorValue = valor.value;
+            const forma = document.getElementById("forma_pago");
+            const formaValue = forma.value;
+            var cadena = "$" + valorValue + " con " + formaValue;
             listaFormasPago.push(cadena);
-            console.log("Lista");  
+            console.log("Lista");
             listaFormasPago.forEach((element) => console.log(element));
-            valor.value = "" ; 
-            forma.value = "" ; 
-            alert("Se agrego: "+ cadena); 
+            valor.value = "";
+            forma.value = "";
+            document.getElementById("formas_pago").value = JSON.stringify(listaFormasPago);
+            alert("Se agrego: " + cadena);
         }
-        function agregarPagare(){
 
+        function functionAgregarPagare() {
+            event.preventDefault();
+            const valor = document.getElementById("valor_pagare");
+            const valorValue = valor.value;
+            const fecha = document.getElementById("fecha_pago_pagare");
+            const fechaValue = fecha.value;
+            var cadena = "$" + valorValue + " con Pagaré Fecha:  " + fechaValue;
+            listaFormasPago.push(cadena);
+            console.log("Lista");
+            listaFormasPago.forEach((element) => console.log(element));
+            valor.value = "";
+            fecha.value = "";
+            document.getElementById("formas_pago").value = JSON.stringify(listaFormasPago);
+            alert("Se agrego: " + cadena);
         }
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -70,6 +84,7 @@
     // numero de cliente -> edit_num_cliente
     // años del contrato -> edit_anios_contrato
     // monto del contrato -> edit_monto_contrato 
+    // monto en letras del contrato -> edit_monto_contrato_texto
     // forma de pago(Varias) -> edit_forma_pago
     // pagare -> edit_pagaré 
     // fecha en texto -> edit_fecha_texto 
@@ -82,6 +97,7 @@
     // monto texto del pagare -> edit_monto_pagare_text
     // Texto para el check 16 -> edit_texto_bono_hospedaje
     // Texto para el check 17 -> edit_texto_bono_int_hospedaje
+    // Numero de cuotas pagare -> edit_num_cuotas 
 
     use PhpOffice\PhpWord\TemplateProcessor;
 
@@ -102,8 +118,8 @@
         $numero_sucesivo = 1; // Si no hay contratos en la base de datos
         echo ("No existe el resultado");
     }
-    $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = "";
-    $aniosContrato = $montoContrato = 0;
+    $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = "";
+    $aniosContrato = $montoContrato = $numCuotas=  0;
     $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = false;
     $fechaActual = $fechaVencimiento = date("Y-m-d");
     // Variable para rastrear errores
@@ -131,7 +147,7 @@
             } else {
                 echo "Error al crear el contrato: " . $conexion->error;
             }
-            $okBono = isset($_POST['bono_hospedaje']);
+            $okBono = isset($_POST['bono_hospedaje']); 
             if ($okBono == 1) {
                 $bonoQory = true;
             } else {
@@ -143,12 +159,17 @@
             } else {
                 $bonoQoryInt = false;
             }
-
+            $formasPago = json_decode($_POST["formas_pago"]);
+            foreach ($formasPago as $forma) {
+                
+                
+            }
             $funciones = new DocumentGenerator();
             $funciones->generarDiferimiento($contrato, $numero_sucesivo, $ciudad, $numCedula, $fechaActual, $nombre_cliente);
             $funciones->generarVerificacion($nombre_cliente, $numero_sucesivo, $numCedula);
             $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt);
             $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala);
+            $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula , $montoContrato, $aniosContrato, $formasPago, $email ,$fechaActual, $ciudad); 
         } else {
             $errores = array();
             if (strlen($nombres) <= 3) {
@@ -194,6 +215,8 @@
 
     <h2 class="tituloH2">Formulario para Contratos</h2>
     <form class="formularioBox" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+        <!-- Hidden -->
+        <input type="hidden" id="formas_pago" name="formas_pago">
         <!-- Nombres -->
         Nombres: <input type="text" name="nombres" value="<?php echo $nombres; ?>">
         <?php if (!empty($errorNombres)) {
@@ -260,6 +283,7 @@
             <input type="number" id="valor_pagare" name="valor" placeholder="Ingrese el valor" style="margin-right:10px">
             <label for="fechaPago" style="margin-right:10px">Fecha de Pago:</label>
             <input type="date" id="fecha_pago_pagare" name="fechaPago" style="margin-right:10px">
+            <button onclick="functionAgregarPagare()">+</button>
         </div>
 
         <input type="checkbox" value="<?php echo $otroFormaPagoBoolean; ?>" id="otroCheckbox"> Otro <br>
@@ -271,7 +295,7 @@
             <button onclick="functionAgregar()">+</button>
         </div>
         <br>
-        <ul id = "listaFormasPagoUl"></ul>
+        <ul id="listaFormasPagoUl"></ul>
 
         <!-- Fecha de vencimiento -->
         Fecha de vencimiento: <input type="date" name="fecha_vencimiento" value="<?php echo $fechaVencimiento; ?>">

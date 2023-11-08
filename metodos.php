@@ -32,8 +32,8 @@ class DocumentGenerator {
         $templateWord->setValue('edit_numero_cedula', $numCedula);
         $templateWord->setValue('edit_fecha_contrato', $fechaFormateada);
         $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
-        $pathToSave = 'nuevosDocumentos/DiferimientoEditado'. $numero_sucesivo .'.docx';
-        $templateWord->saveAs($pathToSave);
+        $pathToSave = 'nuevosDocumentos/DiferimientoEditado'. $numero_sucesivo .'.docx'; 
+        $templateWord->saveAs($pathToSave); 
     }
     public function generarVerificacion($nombre_cliente,$numero_sucesivo, $numCedula){
         $nombre_cliente = strtoupper($nombre_cliente);
@@ -75,8 +75,24 @@ class DocumentGenerator {
         $templateWord->saveAs($pathToSave);
     }
 
-    public function generarContrato() {
+    public function generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula , $montoContrato, $aniosContrato, $formasPago, $email ,$fechaActual, $ciudad) {
+        global $meses;
+        list($ano, $mes, $dia) = explode('-', $fechaActual);
+        $nombre_cliente = strtoupper($nombre_cliente);
+        $fechaFormateada = $dia. " días del mes de " . $meses[intval($mes)] . ", año ". $ano; 
         $templateWord = new TemplateProcessor("docs/Contrato de agencia de viajes_QORIT.docx");
+        $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
+        $templateWord->setValue('edit_contrato_id', $contrato);
+        $templateWord->setValue('edit_num_cliente', $numero_sucesivo);
+        $templateWord->setValue('edit_numero_cedula', $numCedula);
+        $templateWord->setValue('edit_monto_contrato', $montoContrato);
+        $templateWord->setValue('edit_anios_contrato', $aniosContrato);
+        $templateWord->setValue('edit_forma_pago', $formasPago);
+        $templateWord ->setValue('edit_email', $email);
+        $templateWord->setValue('edit_ciudad', $ciudad);
+        $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
+        $pathToSave = 'nuevosDocumentos/ContratoEditado'. $numero_sucesivo .'.docx';
+        $templateWord->saveAs($pathToSave);
     }
     public function generarPagare(){
         $templateWord = new TemplateProcessor("docs/PAGARE QORIT.docx");
