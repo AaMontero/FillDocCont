@@ -118,8 +118,8 @@
         $numero_sucesivo = 1; // Si no hay contratos en la base de datos
         echo ("No existe el resultado");
     }
-    $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = "";
-    $aniosContrato = $montoContrato = $numCuotas=  0;
+    $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
+    $aniosContrato = $montoContrato = $numCuotas=  $valor_pagare =  0;
     $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = false;
     $fechaActual = $fechaVencimiento = date("Y-m-d");
     // Variable para rastrear errores
@@ -159,9 +159,9 @@
             } else {
                 $bonoQoryInt = false;
             }
-            $formasPago = json_decode($_POST["formas_pago"]);
-            foreach ($formasPago as $forma) {
-                
+            $formasPagoString = json_decode($_POST["formas_pago"]);
+            foreach ($formasPagoString as $forma) {
+                $formasPago = $formasPago.$forma.'\n'; 
                 
             }
             $funciones = new DocumentGenerator();
@@ -170,6 +170,7 @@
             $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt);
             $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala);
             $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula , $montoContrato, $aniosContrato, $formasPago, $email ,$fechaActual, $ciudad); 
+            $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, 1500 /*$valor_pagare*/, $fechaActual, 1/*$numCuotas*/,$montoCuotaPagare ,$pagareText); 
         } else {
             $errores = array();
             if (strlen($nombres) <= 3) {
