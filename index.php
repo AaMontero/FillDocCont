@@ -119,8 +119,13 @@
         $numero_sucesivo = 1; // Si no hay contratos en la base de datos
         echo ("No existe el resultado");
     }
+<<<<<<< HEAD
     $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
     $aniosContrato = $montoContrato = $numCuotas =  $valor_pagare =  0;
+=======
+    $nombres = $email = $apellidos = $ciudad  = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
+    $aniosContrato = $montoContrato = $numCuotas=  $valor_pagare =  0;
+>>>>>>> 0039b7ac5a19f1eb9d0d61069dcb8496c31ce3d9
     $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = false;
     $fechaActual = $fechaVencimiento = date("Y-m-d");
     // Variable para rastrear errores
@@ -250,6 +255,7 @@
         } ?>
         <br><br>
         <!-- Provincia -->
+<<<<<<< HEAD
         Provincia: <select class="select-provincia" name="provincia">
             <?php
             $provincias = array(
@@ -265,6 +271,39 @@
             }
             ?>
         </select>
+=======
+        Provincia: <select class="select-provincia" type="text" name="provincia" value="<?php echo $provincia; ?>">
+            <option value="Azuay" <?php if ($provincia === "Azuay") echo "selected"; ?>>Azuay</option>
+            <option value="Bolivar" <?php if ($provincia === "Bolívar") echo "selected"; ?>>Bolívar</option>
+            <option value="Canar" <?php if ($provincia === "Canar") echo "selected"; ?>>Cañar</option>
+            <option value="Carchi" <?php if ($provincia === "Carchi") echo "selected"; ?>>Carchi</option>
+            <option value="Chimborazo" <?php if ($provincia === "Chimborazo") echo "selected"; ?>>Chimborazo</option>
+            <option value="Cotopaxi" <?php if ($provincia === "Cotopaxi") echo "selected"; ?>>Cotopaxi</option>
+            <option value="El Oro" <?php if ($provincia === "El Oro") echo "selected"; ?>>El Oro</option>
+            <option value="Esmeraldas" <?php if ($provincia === "Esmeraldas") echo "selected"; ?>>Esmeraldas</option>
+            <option value="Galapagos" <?php if ($provincia === "Galapagos") echo "selected"; ?>>Galápagos</option>
+            <option value="Guayas" <?php if ($provincia === "Guayas") echo "selected"; ?>>Guayas</option>
+            <option value="Imbabura" <?php if ($provincia === "Imbabura") echo "selected"; ?>>Imbabura</option>
+            <option value="Loja" <?php if ($provincia === "Loja") echo "selected"; ?>>Loja</option>
+            <option value="Los Rios" <?php if ($provincia === "Los Rios") echo "selected"; ?>>Los Ríos</option>
+            <option value="Manabi" <?php if ($provincia === "Manabi") echo "selected"; ?>>Manabí</option>
+            <option value="Morona" <?php if ($provincia === "Morona") echo "selected"; ?>>Morona Santiago</option>
+            <option value="Napo" <?php if ($provincia === "Napo") echo "selected"; ?>>Napo</option>
+            <option value="Orellana" <?php if ($provincia === "Orellana") echo "selected"; ?>>Orellana</option>
+            <option value="Pastaza" <?php if ($provincia === "Pastaza") echo "selected"; ?>>Pastaza</option>
+            <option value="Pichincha" <?php if ($provincia === "Pichincha") echo "selected"; ?>>Pichincha</option>
+            <option value="Santa Ana" <?php if ($provincia === "Santa Ana") echo "selected"; ?>>Santa Elena</option>
+            <option value="Santo domingo " <?php if ($provincia === "Santo Domingo ") echo "selected"; ?>>Santo Domingo </option>
+            <option value="Sucumbios" <?php if ($provincia === "Sucumbios") echo "selected"; ?>>Sucumbíos</option>
+            <option value="Tungurahua" <?php if ($provincia === "Tungurahua") echo "selected"; ?>>Tungurahua</option>
+            <option value="Zamora Chinchipe" <?php if ($provincia === "Zamora Chinchipe") echo "selected"; ?>>Zamora Chinchipe</option>
+        </select>
+    <!-- Agrega más provincias según tus necesidades -->
+                
+        <?php if (!empty($errorProvincia)) {
+            echo "<span style='color: red;'>$errorProvincia</span>";
+        } ?>
+>>>>>>> 0039b7ac5a19f1eb9d0d61069dcb8496c31ce3d9
         <br><br>
         <!-- Ubicacion de la sala -->
         Ubicación de la sala: <input type="text" name="ubicacion_sala" value="<?php echo $ubicacionSala; ?>">
