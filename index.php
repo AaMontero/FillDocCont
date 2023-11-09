@@ -11,7 +11,6 @@
 
     <script>
         var listaFormasPago = [];
-
         function functionAgregar() {
             event.preventDefault();
             const valor = document.getElementById("monto_forma_pago");
@@ -34,13 +33,22 @@
             const valorValue = valor.value;
             const fecha = document.getElementById("fecha_pago_pagare");
             const fechaValue = fecha.value;
+            const cuotas = document.getElementById("n_cuotas_pagare"); 
+            const cuotasValue = cuotas.value; 
+            document.getElementById("pagare_cuotas_info").value = JSON.stringify(cuotasValue);
+            document.getElementById("pagare_monto_info").value = JSON.stringify(valorValue);
+            document.getElementById("pagare_fecha_info").value = JSON.stringify(fechaValue);
             var cadena = "$" + valorValue + " con Pagaré Fecha:  " + fechaValue;
             listaFormasPago.push(cadena);
             console.log("Lista");
             listaFormasPago.forEach((element) => console.log(element));
             valor.value = "";
             fecha.value = "";
+            cuotas.value = ""; 
             document.getElementById("formas_pago").value = JSON.stringify(listaFormasPago);
+            $contienePagare = document.getElementById("contiene_pagare").value;
+            
+            
             alert("Se agrego: " + cadena);
         }
         document.addEventListener("DOMContentLoaded", function() {
@@ -122,9 +130,6 @@
 
     $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
     $aniosContrato = $montoContrato = $numCuotas =  $valor_pagare =  0;
-
-    $nombres = $email = $apellidos = $ciudad  = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
-    $aniosContrato = $montoContrato = $numCuotas=  $valor_pagare =  0;
     $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = false;
     $fechaActual = $fechaVencimiento = date("Y-m-d");
     // Variable para rastrear errores
@@ -164,6 +169,10 @@
             } else {
                 $bonoQoryInt = false;
             }
+            //Adquirir valores pasados desde JS 
+            $numCuotas = json_decode($_POST["pagare_cuotas_info"]);
+            $valorPagare = json_decode($_POST["pagare_monto_info"]);
+            $fechaVencimiento = json_decode($_POST["pagare_fecha_info"]);
             $formasPagoString = json_decode($_POST["formas_pago"]);
             foreach ($formasPagoString as $forma) {
                 $formasPago = $formasPago . $forma . "\n \n";
@@ -174,7 +183,7 @@
             $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt);
             $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala);
             $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad);
-            $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, 1500 /*$valor_pagare*/, $fechaActual, 1 /*$numCuotas*/, $montoCuotaPagare, $pagareText);
+            $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valorPagare, $fechaActual, $numCuotas, $montoCuotaPagare, $pagareText);
         } else {
             $errores = array();
             if (strlen($nombres) <= 3) {
@@ -222,6 +231,10 @@
     <form class="formularioBox" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
         <!-- Hidden -->
         <input type="hidden" id="formas_pago" name="formas_pago">
+        <input type="hidden" id="pagare_cuotas_info" name="pagare_cuotas_info">
+        <input type="hidden" id="pagare_monto_info" name="pagare_monto_info">
+        <input type="hidden" id="pagare_fecha_info" name="pagare_fecha_info">
+        <input type="hidden" id="contiene_pagare" name="contiene_pagare">
         <!-- Nombres -->
         Nombres: <input type="text" name="nombres" value="<?php echo $nombres; ?>">
         <?php if (!empty($errorNombres)) {
@@ -300,7 +313,9 @@
         <input type="checkbox" name="forma_pago" value="<?php echo $pagareBoolean; ?>" id="pagareCheckbox"> Pagaré <br>
         <div id="divPagareCheckbox" style="display:none ; margin-top:10px ; margin-bottom: 5px">
             <label for="valor" style="margin-right:10px">Valor:</label>
-            <input type="number" id="valor_pagare" name="valor" placeholder="Ingrese el valor" style="margin-right:10px">
+            <input type="number" id="valor_pagare" name="valor_pagare" placeholder="Ingrese el valor" style="margin-right:10px">
+            <label for="n_cuotas" style="margin-right:10px">N° Cuotas:</label>
+            <input type="number" id="n_cuotas_pagare" name="n_cuotas_pagare" placeholder="Num de Cuotas" style="margin-right:10px">
             <label for="fechaPago" style="margin-right:10px">Fecha de Pago:</label>
             <input type="date" id="fecha_pago_pagare" name="fechaPago" style="margin-right:10px">
             <button onclick="functionAgregarPagare()">+</button>
@@ -316,10 +331,6 @@
         </div>
         <br>
         <ul id="listaFormasPagoUl"></ul>
-
-        <!-- Fecha de vencimiento -->
-        Fecha de vencimiento: <input type="date" name="fecha_vencimiento" value="<?php echo $fechaVencimiento; ?>">
-        <br><br>
 
         <!-- Bono hospedaje Qory Loyalty -->
         Bono hospedaje Qory Loyalty: <input type="checkbox" name="bono_hospedaje" id="bono_hospedaje_checkbox" value="1">

@@ -82,8 +82,7 @@ class DocumentGenerator
     public function generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPago, $email, $fechaActual, $ciudad)
     {
         $formasPagoS = ""; 
-        $formasPagoArray = array(); 
-        
+        $formasPagoArray = array();       
         foreach ($formasPago as $forma) {
             $formasPagoS .= $forma . "\n";
             $formasPagoArray[] = $forma; 
@@ -99,7 +98,6 @@ class DocumentGenerator
         $montoContratoText = strtoupper($montoContratoText);
         $fechaFormateada = $dia . " días del mes de " . $meses[intval($mes)] . ", año " . $ano;
         $templateWord = new TemplateProcessor("docs/Contrato de agencia de viajes_QORIT.docx");
-        echo ($formasPagoS);
         $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
         $templateWord->setValue('edit_contrato_id', $contrato);
         $templateWord->setValue('edit_num_cliente', $numero_sucesivo);
@@ -132,8 +130,6 @@ class DocumentGenerator
         $pagareText = $fmt->format($valor_pagare);
         $pagareText = strtoupper($pagareText);
         $montoCuotaPagare = ($valor_pagare / $numCuotas);
-        $ciudadMayu = strtoupper($ciudad);
-        $ciudad = ucwords($ciudad);
         $templateWord = new TemplateProcessor("docs/PAGARE QORIT.docx");
         $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
         $templateWord->setValue('edit_numero_cedula', $numCedula);
@@ -143,7 +139,6 @@ class DocumentGenerator
         $templateWord->setValue('edit_num_cuotas', $numCuotas);
         $templateWord->setValue('edit_monto_pagare_text', $pagareText);
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
-        $templateWord->setValue('edit_ciudad_mayu', $ciudadMayu);
         $templateWord->setValue('edit_monto_cuota_pagare', $montoCuotaPagare);
         $templateWord->setValue('edit_monto_pagare', $valor_pagare);
         $pathToSave = 'nuevosDocumentos/pagareEditado' . $numero_sucesivo . '.docx';
