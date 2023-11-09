@@ -98,6 +98,7 @@
     // Texto para el check 16 -> edit_texto_bono_hospedaje
     // Texto para el check 17 -> edit_texto_bono_int_hospedaje
     // Numero de cuotas pagare -> edit_num_cuotas 
+    // Texto de monto del contrato -> edit_texto_anios_contrato 
 
     use PhpOffice\PhpWord\TemplateProcessor;
 
@@ -119,7 +120,7 @@
         echo ("No existe el resultado");
     }
     $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
-    $aniosContrato = $montoContrato = $numCuotas=  $valor_pagare =  0;
+    $aniosContrato = $montoContrato = $numCuotas =  $valor_pagare =  0;
     $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = false;
     $fechaActual = $fechaVencimiento = date("Y-m-d");
     // Variable para rastrear errores
@@ -147,7 +148,7 @@
             } else {
                 echo "Error al crear el contrato: " . $conexion->error;
             }
-            $okBono = isset($_POST['bono_hospedaje']); 
+            $okBono = isset($_POST['bono_hospedaje']);
             if ($okBono == 1) {
                 $bonoQory = true;
             } else {
@@ -161,16 +162,15 @@
             }
             $formasPagoString = json_decode($_POST["formas_pago"]);
             foreach ($formasPagoString as $forma) {
-                $formasPago = $formasPago.$forma.'\n'; 
-                
+                $formasPago = $formasPago . $forma . "\n \n";
             }
             $funciones = new DocumentGenerator();
             $funciones->generarDiferimiento($contrato, $numero_sucesivo, $ciudad, $numCedula, $fechaActual, $nombre_cliente);
             $funciones->generarVerificacion($nombre_cliente, $numero_sucesivo, $numCedula);
             $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt);
             $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala);
-            $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula , $montoContrato, $aniosContrato, $formasPago, $email ,$fechaActual, $ciudad); 
-            $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, 1500 /*$valor_pagare*/, $fechaActual, 1/*$numCuotas*/,$montoCuotaPagare ,$pagareText); 
+            $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad);
+            $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, 1500 /*$valor_pagare*/, $fechaActual, 1 /*$numCuotas*/, $montoCuotaPagare, $pagareText);
         } else {
             $errores = array();
             if (strlen($nombres) <= 3) {
@@ -250,10 +250,21 @@
         } ?>
         <br><br>
         <!-- Provincia -->
-        Provincia: <input type="text" name="provincia" value="<?php echo $provincia; ?>">
-        <?php if (!empty($errorProvincia)) {
-            echo "<span style='color: red;'>$errorProvincia</span>";
-        } ?>
+        Provincia: <select class="select-provincia" name="provincia">
+            <?php
+            $provincias = array(
+                "Azuay", "Bolívar", "Cañar", "Carchi", "Chimborazo", "Cotopaxi", "El Oro", "Esmeraldas",
+                "Galápagos", "Guayas", "Imbabura", "Loja", "Los Ríos", "Manabí", "Morona Santiago",
+                "Napo", "Orellana", "Pastaza", "Pichincha", "Santa Elena", "Santo Domingo",
+                "Sucumbíos", "Tungurahua", "Zamora Chinchipe"
+            );
+
+            foreach ($provincias as $p) {
+                $selected = ($p === $provincia) ? 'selected' : '';
+                echo "<option value='$p' $selected>$p</option>";
+            }
+            ?>
+        </select>
         <br><br>
         <!-- Ubicacion de la sala -->
         Ubicación de la sala: <input type="text" name="ubicacion_sala" value="<?php echo $ubicacionSala; ?>">

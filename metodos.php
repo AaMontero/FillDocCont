@@ -1,6 +1,7 @@
 <?php
 
 use PhpOffice\PhpWord\TemplateProcessor;
+
 include("conexion.php");
 require 'vendor/autoload.php';
 $meses = array(
@@ -19,8 +20,6 @@ $meses = array(
 );
 class DocumentGenerator
 {
-
-
     public function generarDiferimiento($contrato, $numero_sucesivo, $ciudad, $numCedula, $fechaActual, $nombre_cliente)
     {
         global $meses;
@@ -82,28 +81,41 @@ class DocumentGenerator
 
     public function generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPago, $email, $fechaActual, $ciudad)
     {
+        $formasPagoS = ""; 
+        $formasPagoArray = array(); 
+        
+        foreach ($formasPago as $forma) {
+            $formasPagoS .= $forma . "\n";
+            $formasPagoArray[] = $forma; 
+        }
+
         global $meses;
         list($ano, $mes, $dia) = explode('-', $fechaActual);
         $nombre_cliente = strtoupper($nombre_cliente);
+        $fmt = new NumberFormatter('es', NumberFormatter::SPELLOUT);
+        $montoContratoText = $fmt->format($montoContrato);
+        $aniosContratoText = $fmt->format($aniosContrato);
+        $aniosContratoText = strtoupper($aniosContratoText);
+        $montoContratoText = strtoupper($montoContratoText);
         $fechaFormateada = $dia . " días del mes de " . $meses[intval($mes)] . ", año " . $ano;
         $templateWord = new TemplateProcessor("docs/Contrato de agencia de viajes_QORIT.docx");
-        $phpWord = new \PhpOffice\PhpWord\PhpWord();
-        $section = $phpWord->addSection();
-
-        $lineas = explode("\n", $formasPago);
-
-        foreach ($lineas as $linea) {
-            $section->addText($linea);
-        }
+        echo ($formasPagoS);
         $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
         $templateWord->setValue('edit_contrato_id', $contrato);
         $templateWord->setValue('edit_num_cliente', $numero_sucesivo);
         $templateWord->setValue('edit_numero_cedula', $numCedula);
         $templateWord->setValue('edit_monto_contrato', $montoContrato);
         $templateWord->setValue('edit_anios_contrato', $aniosContrato);
-        $templateWord->setValue('edit_forma_pago', $formasPago  );
+        for ($i = 1; $i <= count($formasPagoArray); $i++) {
+            $templateWord->setValue("edit_forma_pago_$i", $formasPagoArray[$i - 1]);
+        }
+        for ($i = count($formasPagoArray); $i <= 5; $i++) {
+            $templateWord->setValue("edit_forma_pago_$i", "");
+        }
         $templateWord->setValue('edit_email', $email);
         $templateWord->setValue('edit_ciudad', $ciudad);
+        $templateWord->setValue('edit_texto_anios_contrato', $aniosContratoText);
+        $templateWord->setValue('edit_monto_contrato_texto', $montoContratoText);
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
         $pathToSave = 'nuevosDocumentos/ContratoEditado' . $numero_sucesivo . '.docx';
         $templateWord->saveAs($pathToSave);
@@ -113,25 +125,28 @@ class DocumentGenerator
         global $meses;
         list($ano, $mes, $dia) = explode('-', $fechaActual);
         list($ano2, $mes2, $dia2) = explode('-', $fechaVencimiento);
-        $fechaFormateada = " a los " .$dia. " dias, del mes de " . $meses[intval($mes)] . " del ". $ano; 
-        $fechaFormatVencimiento = $dia2. ' DE '. strtoupper($meses[intval($mes2)]). ' DEL ' . $ano2 ; 
-        $nombre_cliente = strtoupper($nombre_cliente);     
+        $fechaFormateada = " a los " . $dia . " dias, del mes de " . $meses[intval($mes)] . " del " . $ano;
+        $fechaFormatVencimiento = $dia2 . ' DE ' . strtoupper($meses[intval($mes2)]) . ' DEL ' . $ano2;
+        $nombre_cliente = strtoupper($nombre_cliente);
         $fmt = new NumberFormatter('es', NumberFormatter::SPELLOUT);
         $pagareText = $fmt->format($valor_pagare);
-        $pagareText = strtoupper($pagareText); 
+        $pagareText = strtoupper($pagareText);
         $montoCuotaPagare = ($valor_pagare / $numCuotas);
+        $ciudadMayu = strtoupper($ciudad);
+        $ciudad = ucwords($ciudad);
         $templateWord = new TemplateProcessor("docs/PAGARE QORIT.docx");
-        $templateWord-> setValue('edit_nombres_apellidos', $nombre_cliente);
+        $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
         $templateWord->setValue('edit_numero_cedula', $numCedula);
         $templateWord->setValue('edit_fecha_vencimiento', $fechaFormatVencimiento);
         $templateWord->setValue('edit_ciudad', $ciudad);
         $templateWord->setValue('edit_email', $email);
-        $templateWord->setValue('edit_num_cuotas' , $numCuotas);
+        $templateWord->setValue('edit_num_cuotas', $numCuotas);
         $templateWord->setValue('edit_monto_pagare_text', $pagareText);
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
+        $templateWord->setValue('edit_ciudad_mayu', $ciudadMayu);
         $templateWord->setValue('edit_monto_cuota_pagare', $montoCuotaPagare);
         $templateWord->setValue('edit_monto_pagare', $valor_pagare);
-        $pathToSave = 'nuevosDocumentos/pagareEditado'. $numero_sucesivo .'.docx';
+        $pathToSave = 'nuevosDocumentos/pagareEditado' . $numero_sucesivo . '.docx';
         $templateWord->saveAs($pathToSave);
     }
 
