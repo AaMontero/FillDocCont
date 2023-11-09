@@ -3,9 +3,10 @@
 
 <head>
     <title class="titulo">Formulario PHP</title>
+    
     <link rel="stylesheet" href="style_formulario.css">
 </head>
-
+<h1>Bienvenido, <?php echo $usuario; ?></h1>
 <body>
 
 
@@ -145,7 +146,15 @@
             $contrato = "QT" . $ciudad;
             $nombre_cliente = $nombres . " " . $apellidos;
             $insercion = "INSERT INTO contratos (ciudad, nombre, fecha)     
-                VALUES ('$ciudad', '$nombre_cliente', '$fechaActual')";
+                VALUES ('$ciudad', '$nombre_cliente', '$fechaActual' )";
+                // Verificar si el usuario ha iniciado sesión
+                if (!isset($_SESSION['usuario'])) {
+                    header('Location: send.php');
+                    exit();
+                }
+                
+                // Obtener el nombre de usuario desde la sesión
+                $username = $_SESSION['usuario'];
 
             if ($conexion->query($insercion) === TRUE) {
                 //echo "Contrato creado exitosamente con numero: " . $contrato;

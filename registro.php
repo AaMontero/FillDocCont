@@ -56,11 +56,15 @@
 </head>
 <body>
     <h2>Registro</h2>
+  
     <form action="procesar_registro.php" method="post">
         Nombre: <input type="text" name="usuario" required><br>
         Email: <input type="email" name="email" required><br>
         Contraseña: <input type="password" name="contrasena" required><br>
         <input type="submit" value="Registrarse">
     </form>
+
+
 </body>
+
 </html>
