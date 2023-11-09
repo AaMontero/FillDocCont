@@ -60,3 +60,10 @@ input[type="submit"] {
 .formularioBox .pagare{
     background-color: green;
 }
+
+.select-provincia {
+    padding: 5px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}

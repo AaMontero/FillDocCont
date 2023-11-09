@@ -139,6 +139,8 @@ class DocumentGenerator
     {
         $nombre_cliente = strtoupper($nombre_cliente);
         $ubicacionSala = strtoupper($ubicacionSala);
+        $ciudadMayu = strtoupper($ciudad);
+        $ciudad = ucwords($ciudad);
         global $meses;
         list($ano, $mes, $dia) = explode('-', $fechaActual);
         $fechaFormateada = $dia . " de " . $meses[intval($mes)] . " del " . $ano;
@@ -146,6 +148,7 @@ class DocumentGenerator
         $templateWord->setValue('edit_contrato_id', $contrato);
         $templateWord->setValue('edit_num_cliente', $numero_sucesivo);
         $templateWord->setValue('edit_ciudad', $ciudad);
+        $templateWord->setValue('edit_ciudad_mayu', $ciudadMayu);
         $templateWord->setValue('edit_provincia', $provincia);
         $templateWord->setValue('edit_fecha_contrato', $fechaActual);
         $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
