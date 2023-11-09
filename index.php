@@ -11,53 +11,65 @@
 
     <script>
         var listaFormasPago = [];
+        var pagareBoolean = false;
+
         function functionAgregar() {
             event.preventDefault();
             const valor = document.getElementById("monto_forma_pago");
-            const valorValue = valor.value;
             const forma = document.getElementById("forma_pago");
             const formaValue = forma.value;
-            var cadena = "$" + valorValue + " con " + formaValue;
-            listaFormasPago.push(cadena);
-            console.log("Lista");
-            listaFormasPago.forEach((element) => console.log(element));
-            valor.value = "";
-            forma.value = "";
-            document.getElementById("formas_pago").value = JSON.stringify(listaFormasPago);
-            alert("Se agrego: " + cadena);
+            const valorValue = valor.value;
+            if (valorValue === "" || formaValue === "") {
+                alert("Por favor, complete todos los campos antes de agregar una forma de pago.");
+            } else {
+                var cadena = "$" + valorValue + " con " + formaValue;
+                listaFormasPago.push(cadena);
+                console.log("Lista");
+                listaFormasPago.forEach((element) => console.log(element));
+                valor.value = "";
+                forma.value = "";
+                document.getElementById("formas_pago").value = JSON.stringify(listaFormasPago);
+                alert("Se agregó: " + cadena);
+            }
         }
 
         function functionAgregarPagare() {
-            event.preventDefault();
-            const valor = document.getElementById("valor_pagare");
-            const valorValue = valor.value;
-            const fecha = document.getElementById("fecha_pago_pagare");
-            const fechaValue = fecha.value;
-            const cuotas = document.getElementById("n_cuotas_pagare"); 
-            const cuotasValue = cuotas.value; 
-            document.getElementById("pagare_cuotas_info").value = JSON.stringify(cuotasValue);
-            document.getElementById("pagare_monto_info").value = JSON.stringify(valorValue);
-            document.getElementById("pagare_fecha_info").value = JSON.stringify(fechaValue);
-            var cadena = "$" + valorValue + " con Pagaré Fecha:  " + fechaValue;
-            listaFormasPago.push(cadena);
-            console.log("Lista");
-            listaFormasPago.forEach((element) => console.log(element));
-            valor.value = "";
-            fecha.value = "";
-            cuotas.value = ""; 
-            document.getElementById("formas_pago").value = JSON.stringify(listaFormasPago);
-            $contienePagare = document.getElementById("contiene_pagare").value;
-            
-            
-            alert("Se agrego: " + cadena);
+            if (pagareBoolean == true) {
+                alert("Ya se agrego un Pagaré previamente");
+            } else {
+                event.preventDefault();
+                const valor = document.getElementById("valor_pagare");
+                const fecha = document.getElementById("fecha_pago_pagare");
+                const cuotas = document.getElementById("n_cuotas_pagare");
+                const valorValue = valor.value;
+                const fechaValue = fecha.value;
+                const cuotasValue = cuotas.value;
+                if (valorValue === "" || fechaValue === "" || cuotasValue === "") {
+                    alert("Por favor, complete todos los campos antes de agregar el Pagaré.");
+                } else {
+                    document.getElementById("pagare_cuotas_info").value = JSON.stringify(cuotasValue);
+                    document.getElementById("pagare_monto_info").value = JSON.stringify(valorValue);
+                    document.getElementById("pagare_fecha_info").value = JSON.stringify(fechaValue);
+                    var cadena = "$" + valorValue + " con Pagaré Fecha: " + fechaValue;
+                    listaFormasPago.push(cadena);
+                    console.log("Lista");
+                    listaFormasPago.forEach((element) => console.log(element));
+                    valor.value = "";
+                    fecha.value = "";
+                    cuotas.value = "";
+                    document.getElementById("formas_pago").value = JSON.stringify(listaFormasPago);
+                    document.getElementById("contiene_pagare").value = "true";
+                    pagareBoolean = true;
+                    alert("Se agregó: " + cadena);
+                }
+            }
+
         }
         document.addEventListener("DOMContentLoaded", function() {
-
             const pagareCheckbox = document.getElementById("pagareCheckbox");
             const otroCheckbox = document.getElementById("otroCheckbox");
             const pagareFields = document.getElementById("divPagareCheckbox");
             const otroFields = document.getElementById("divOtrosCheckbox");
-
             pagareCheckbox.addEventListener("change", function() {
                 if (pagareCheckbox.checked) {
                     console.log("Esta entrando a este metodo");
@@ -67,7 +79,6 @@
                     pagareFields.style.display = "none";
                 }
             });
-
             otroCheckbox.addEventListener("change", function() {
                 if (otroCheckbox.checked) {
                     console.log("Esta entrando a este metodo otros");
@@ -130,7 +141,7 @@
 
     $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
     $aniosContrato = $montoContrato = $numCuotas =  $valor_pagare =  0;
-    $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = false;
+    $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = $contienePagare = false;
     $fechaActual = $fechaVencimiento = date("Y-m-d");
     // Variable para rastrear errores
     $errorNombres = $errorCedula = $errorApellidos = $errorUbicacionSala =  $errorCiudad = $errorCorreo = $erroraniosContrato = $errorMontoContrato = $errorProvincia = "";
@@ -174,16 +185,23 @@
             $valorPagare = json_decode($_POST["pagare_monto_info"]);
             $fechaVencimiento = json_decode($_POST["pagare_fecha_info"]);
             $formasPagoString = json_decode($_POST["formas_pago"]);
-            foreach ($formasPagoString as $forma) {
-                $formasPago = $formasPago . $forma . "\n \n";
+            if ($formasPagoString == "") {
+                echo ("Inserte una forma de pago");
+            } else {
+                foreach ($formasPagoString as $forma) {
+                    $formasPago = $formasPago . $forma . "\n \n";
+                }
+                $funciones = new DocumentGenerator();
+                $contienePagare = (json_decode($_POST["contiene_pagare"]) == "true");
+                if ($contienePagare == 1) {
+                    $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valorPagare, $fechaActual, $numCuotas, $montoCuotaPagare, $pagareText);
+                }
+                $funciones->generarDiferimiento($contrato, $numero_sucesivo, $ciudad, $numCedula, $fechaActual, $nombre_cliente);
+                $funciones->generarVerificacion($nombre_cliente, $numero_sucesivo, $numCedula);
+                $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt);
+                $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala);
+                $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad);
             }
-            $funciones = new DocumentGenerator();
-            $funciones->generarDiferimiento($contrato, $numero_sucesivo, $ciudad, $numCedula, $fechaActual, $nombre_cliente);
-            $funciones->generarVerificacion($nombre_cliente, $numero_sucesivo, $numCedula);
-            $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt);
-            $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala);
-            $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad);
-            $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valorPagare, $fechaActual, $numCuotas, $montoCuotaPagare, $pagareText);
         } else {
             $errores = array();
             if (strlen($nombres) <= 3) {
@@ -282,7 +300,7 @@
             }
             ?>
         </select>
-                
+
         <?php if (!empty($errorProvincia)) {
             echo "<span style='color: red;'>$errorProvincia</span>";
         } ?>
@@ -334,14 +352,10 @@
 
         <!-- Bono hospedaje Qory Loyalty -->
         Bono hospedaje Qory Loyalty: <input type="checkbox" name="bono_hospedaje" id="bono_hospedaje_checkbox" value="1">
-
         <br><br>
-
         <!-- Bono de hospedaje internacional Qory Loyalty -->
         Bono de hospedaje internacional Qory Loyalty: <input type="checkbox" name="bono_hospedaje_internacional" id="bono_hospedaje_internacional_checkbox" value="<?php echo $bonoQoryInt ?>">
         <br><br>
-
-
         <!-- Aquí está el botón para ejecutar el código -->
         <div class="divBoton">
             <input type="submit" name="submit" value="Generar Documentos">
