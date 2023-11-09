@@ -12,13 +12,13 @@
     <img src="img/logo.png" alt="logo">
     <form action="send.php" method="post" autocomplete="off">
         <div class="input-group" >    
-            <div class="input-container">
+            <div  class="input-container">
                 <input type="text" placeholder="Nombre" name="usuario">
                 <i class="fa-solid fa-user"></i>
             </div>
 
             <div class="input-container">
-                <input type="password" placeholder="Password" name="clave">
+                <input type="password" placeholder="Password" name="contrasena">
                 <i class="fa-solid fa-lock"></i>
             </div>
 
