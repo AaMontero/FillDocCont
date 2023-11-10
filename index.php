@@ -139,7 +139,7 @@
         echo ("No existe el resultado");
     }
 
-    $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
+   $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
     $aniosContrato = $montoContrato = $numCuotas =  $valor_pagare =  0;
     $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = $contienePagare = false;
     $fechaActual = $fechaVencimiento = date("Y-m-d");
@@ -160,8 +160,21 @@
             $cedula = $numCedula;
             $contrato = "QT" . $ciudad;
             $nombre_cliente = $nombres . " " . $apellidos;
+<<<<<<< HEAD
             $insercion = "INSERT INTO contratos (ciudad, nombre, fecha, reg_usuario)     
                 VALUES ('$ciudad', '$nombre_cliente', '$fechaActual', 'Anthonny' )";
+=======
+            $insercion = "INSERT INTO contratos (ciudad, nombre, fecha)     
+                VALUES ('$ciudad', '$nombre_cliente', '$fechaActual' )";
+                // Verificar si el usuario ha iniciado sesión
+                if (!isset($_SESSION['usuario'])) {
+                    header('Location: send.php');
+                    exit();
+                }
+                
+                // Obtener el nombre de usuario desde la sesión
+                $usuario = $_SESSION['usuario'];
+>>>>>>> 27456b439b78b0939be1fcdaf94ad53c68f23d56
 
             if ($conexion->query($insercion) === TRUE) {
                 //echo "Contrato creado exitosamente con numero: " . $contrato;
@@ -243,8 +256,10 @@
         $data = htmlspecialchars($data);
         return $data;
     }
-    ?>
 
+
+    ?>
+ 
     <h2 class="tituloH2">Formulario para Contratos</h2>
     <form class="formularioBox" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
         <!-- Hidden -->
