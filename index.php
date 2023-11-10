@@ -139,7 +139,6 @@
         $numero_sucesivo = $fila['max_numero'] + 1;
     } else {
         $numero_sucesivo = 1; // Si no hay contratos en la base de datos
-        echo ("No existe el resultado");
     }
 
     $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
@@ -165,7 +164,7 @@
             $nombre_cliente = $nombres . " " . $apellidos;
             //Cambiar
             $insercion = "INSERT INTO contratos (ciudad, nombre, fecha, reg_usuario)    
-                VALUES ('$ciudad', '$nombre_cliente', '$fechaActual' ,$usuarioLogin)";
+                VALUES ('$ciudad', '$nombre_cliente', '$fechaActual' ,'$usuarioLogin')";
 
             if ($conexion->query($insercion) === TRUE) {
                 //echo "Contrato creado exitosamente con numero: " . $contrato;
