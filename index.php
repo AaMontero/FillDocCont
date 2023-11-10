@@ -6,7 +6,6 @@
     
     <link rel="stylesheet" href="style_formulario.css">
 </head>
-<h1>Bienvenido, <?php echo $usuario; ?></h1>
 <body>
 
 
@@ -140,7 +139,7 @@
         echo ("No existe el resultado");
     }
 
-    $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
+   $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
     $aniosContrato = $montoContrato = $numCuotas =  $valor_pagare =  0;
     $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = $contienePagare = false;
     $fechaActual = $fechaVencimiento = date("Y-m-d");
@@ -170,7 +169,7 @@
                 }
                 
                 // Obtener el nombre de usuario desde la sesión
-                $username = $_SESSION['usuario'];
+                $usuario = $_SESSION['usuario'];
 
             if ($conexion->query($insercion) === TRUE) {
                 //echo "Contrato creado exitosamente con numero: " . $contrato;
@@ -252,8 +251,10 @@
         $data = htmlspecialchars($data);
         return $data;
     }
-    ?>
 
+
+    ?>
+ 
     <h2 class="tituloH2">Formulario para Contratos</h2>
     <form class="formularioBox" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
         <!-- Hidden -->
