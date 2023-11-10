@@ -34,7 +34,7 @@ class DocumentGenerator
         $templateWord->setValue('edit_numero_cedula', $numCedula);
         $templateWord->setValue('edit_fecha_contrato', $fechaFormateada);
         $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
-        $pathToSave = 'contratos/QT'.$nombre_cliente.'/Diferimiento' . $numero_sucesivo . '.docx';
+        $pathToSave = 'contratos/QT'.$nombre_cliente.'Diferimiento' . $numero_sucesivo . '.docx';
         $templateWord->saveAs($pathToSave);
     }
     public function generarVerificacion($nombre_cliente, $numero_sucesivo, $numCedula)
@@ -43,7 +43,7 @@ class DocumentGenerator
         $templateWord = new TemplateProcessor("docs/VERIFICACION.docx");
         $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
         $templateWord->setValue('edit_numero_cedula', $numCedula);
-        $pathToSave = 'contratos/QT'.$nombre_cliente.'/VerificacionEditado' . $numero_sucesivo . '.docx';
+        $pathToSave = 'contratos/QT'.$nombre_cliente.'VerificacionEditado' . $numero_sucesivo . '.docx';
         $templateWord->saveAs($pathToSave);
     }
 
@@ -75,7 +75,7 @@ class DocumentGenerator
             $templateWord->setValue('edit_bono_hospedaje', "");
             $templateWord->setValue('edit_texto_bono_hospedaje', "");
         }
-        $pathToSave = 'contratos/QT'.$nombre_cliente.'/Anexo3Editado' . $numero_sucesivo . '.docx';
+        $pathToSave = 'contratos/QT'.$nombre_cliente.'Anexo3Editado' . $numero_sucesivo . '.docx';
         $templateWord->saveAs($pathToSave);
     }
 
@@ -115,7 +115,7 @@ class DocumentGenerator
         $templateWord->setValue('edit_texto_anios_contrato', $aniosContratoText);
         $templateWord->setValue('edit_monto_contrato_texto', $montoContratoText);
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
-        $pathToSave = 'contratos/QT'.$nombre_cliente.'/ContratoEditado' . $numero_sucesivo . '.docx';
+        $pathToSave = 'contratos/QT'.$nombre_cliente.'ContratoEditado' . $numero_sucesivo . '.docx';
         $templateWord->saveAs($pathToSave);
     }
     public function generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valor_pagare, $fechaActual, $numCuotas, $montoCuotaPagare, $pagareText)
@@ -141,7 +141,7 @@ class DocumentGenerator
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
         $templateWord->setValue('edit_monto_cuota_pagare', $montoCuotaPagare);
         $templateWord->setValue('edit_monto_pagare', $valor_pagare);
-        $pathToSave = 'contratos/QT'.$nombre_cliente.'/pagareEditado' . $numero_sucesivo . '.docx';
+        $pathToSave = 'contratos/QT'.$nombre_cliente.'pagareEditado' . $numero_sucesivo . '.docx';
         $templateWord->saveAs($pathToSave);
     }
 
@@ -166,7 +166,7 @@ class DocumentGenerator
         $templateWord->setValue('edit_sala_lugar', $ubicacionSala);
         $templateWord->setValue('edit_email', $email);
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
-        $pathToSave = 'contratos/QT'.$nombre_cliente.'/checkListEditado' . $numero_sucesivo . '.docx';
+        $pathToSave = 'contratos/QT'.$nombre_cliente.'checkListEditado' . $numero_sucesivo . '.docx';
         $templateWord->saveAs($pathToSave);
     }
 }
