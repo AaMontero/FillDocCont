@@ -6,7 +6,6 @@
     
     <link rel="stylesheet" href="style_formulario.css">
 </head>
-<h1>Bienvenido, <?php echo $usuario; ?></h1>
 <body>
 
 
@@ -161,16 +160,8 @@
             $cedula = $numCedula;
             $contrato = "QT" . $ciudad;
             $nombre_cliente = $nombres . " " . $apellidos;
-            $insercion = "INSERT INTO contratos (ciudad, nombre, fecha)     
-                VALUES ('$ciudad', '$nombre_cliente', '$fechaActual' )";
-                // Verificar si el usuario ha iniciado sesión
-                if (!isset($_SESSION['usuario'])) {
-                    header('Location: send.php');
-                    exit();
-                }
-                
-                // Obtener el nombre de usuario desde la sesión
-                $username = $_SESSION['usuario'];
+            $insercion = "INSERT INTO contratos (ciudad, nombre, fecha, reg_usuario)     
+                VALUES ('$ciudad', '$nombre_cliente', '$fechaActual', 'Anthonny' )";
 
             if ($conexion->query($insercion) === TRUE) {
                 //echo "Contrato creado exitosamente con numero: " . $contrato;
