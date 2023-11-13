@@ -131,7 +131,7 @@
 
 
     //Se busca dentro de la base de datos el mayor numero de contacto 
-    $consulta = "SELECT MAX(id) AS max_numero FROM contratos"; //Consulta SQL 
+    $consulta = "SELECT MAX(contrato_id) AS max_numero FROM contratos"; //Consulta SQL 
     $resultado = $conexion->query($consulta); //Se almacena lo obtenido en una variable 
     if ($resultado) {
         //Si existe el resultado se asigna un nuevo número 
