@@ -203,10 +203,11 @@
                 $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaCarpetaSave);
                 $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaCarpetaSave);
                 $funciones->generarDiferimiento($contrato, $numero_sucesivo, $ciudad, $numCedula, $fechaActual, $nombre_cliente, $rutaCarpetaSave);
-
                 if ($contienePagare == 1) {
                     $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valorPagare, $fechaActual, $numCuotas, $montoCuotaPagare, $pagareText, $rutaCarpetaSave);
                 }
+                $nombres = $email = $cedula= $apellidos =$ciudad =$numCedula =$provincia =$ubicacionSala = $aniosContrato = $montoContrato = "";  
+                echo("Los documentos se generaron correctamente"); 
             }
         } else {
             $errores = array();
