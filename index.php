@@ -249,9 +249,10 @@
         return $data;
     }
     ?>
+   
+    <form class="formularioBox" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <h2 class="tituloH2">Formulario para Contratos</h2>
     <h2>Bienvenido <?php echo $usuarioLogin; ?></h2>
-    <form class="formularioBox" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
         <!-- Hidden -->
         <input type="hidden" id="formas_pago" name="formas_pago">
         <input type="hidden" id="pagare_cuotas_info" name="pagare_cuotas_info">

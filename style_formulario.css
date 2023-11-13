@@ -1,33 +1,45 @@
 /* styles.css */
-
+body{
+    background-image: url(https://user-images.githubusercontent.com/13468728/233847739-219cb494-c265-4554-820a-bd3424c59065.jpg);
+}
 /* Estilo para el formulario */
 .formularioBox {
     max-width: 50vw;
-    margin: 0 auto;
-    padding: 20px;
+    background: #24303c;
+    padding: 30px;
     padding-right: 40px;
-    background-color: #f5f5f5;
-    border: 1px solid #ccc;
+    margin: 0 auto;
+    margin-top: 50px;
     border-radius: 5px;
-    
+    font-family: 'calibri';
+    color: white;
+    box-shadow: 7px 13px 37px #000;    
 }
+
 /*Estilo para el titulo*/
 .tituloH2{
     text-align: center;
+    font-size: 22px;
+    margin-bottom: 20px;
 }
 /* Estilo para los campos de entrada y etiquetas */
 .formularioBox input[type="text"] {
     width: 100%;
+    background: #24303c;
     padding: 10px;
-    margin-bottom: 10px;
-    margin-right: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    border: 1px solid #1f53c5;
+    font-family: 'calibri';
+    font-size: 18px;
+    color: white;
 }
 
 .formularioBox label {
-    display: block;
-    font-weight: bold;
+    height: 40px;
+    text-align: center;
+    font-size: 18px;
+    line-height: 40px;
 }
 
 /* Estilo para los mensajes de error */
@@ -53,9 +65,10 @@ input[type="submit"] {
     cursor: pointer;
 }
 .div_pagare{
-    align-items: center;
-    display: flex;
-    background-color: blue;
+    padding: 5px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 .formularioBox .pagare{
     background-color: green;
