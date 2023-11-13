@@ -9,8 +9,8 @@
 
 <body>
     <?php
-    session_start(); 
-    $usuarioLogin =  $_SESSION['usuario'];?>
+    session_start();
+    $usuarioLogin =  $_SESSION['usuario']; ?>
 
     <script>
         var listaFormasPago = [];
@@ -129,7 +129,7 @@
     require 'vendor/autoload.php'; //Librería para cargar documentos de word
     $content = "";
 
-    
+
     //Se busca dentro de la base de datos el mayor numero de contacto 
     $consulta = "SELECT MAX(id) AS max_numero FROM contratos"; //Consulta SQL 
     $resultado = $conexion->query($consulta); //Se almacena lo obtenido en una variable 
@@ -194,16 +194,19 @@
                 foreach ($formasPagoString as $forma) {
                     $formasPago = $formasPago . $forma . "\n \n";
                 }
-                $funciones = new DocumentGenerator();
                 $contienePagare = (json_decode($_POST["contiene_pagare"]) == "true");
+                $funciones = new DocumentGenerator();
+                $rutaCarpetaSave = $funciones->crearCarpetaCliente($nombre_cliente, $fechaActual);
+                //echo($rutaCarpetaSave); 
+                $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad, $rutaCarpetaSave);
+                $funciones->generarVerificacion($nombre_cliente, $numero_sucesivo, $numCedula, $rutaCarpetaSave);
+                $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaCarpetaSave);
+                $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaCarpetaSave);
+                $funciones->generarDiferimiento($contrato, $numero_sucesivo, $ciudad, $numCedula, $fechaActual, $nombre_cliente, $rutaCarpetaSave);
+
                 if ($contienePagare == 1) {
-                    $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valorPagare, $fechaActual, $numCuotas, $montoCuotaPagare, $pagareText);
+                    $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valorPagare, $fechaActual, $numCuotas, $montoCuotaPagare, $pagareText, $rutaCarpetaSave);
                 }
-                $funciones->generarDiferimiento($contrato, $numero_sucesivo, $ciudad, $numCedula, $fechaActual, $nombre_cliente);
-                $funciones->generarVerificacion($nombre_cliente, $numero_sucesivo, $numCedula);
-                $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt);
-                $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala);
-                $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad);
             }
         } else {
             $errores = array();
@@ -236,8 +239,6 @@
             }
         }
     }
-
-
     $conexion->close();
     function test_input($data)
     {
@@ -246,10 +247,7 @@
         $data = htmlspecialchars($data);
         return $data;
     }
-
-
     ?>
-
     <h2 class="tituloH2">Formulario para Contratos</h2>
     <h2>Bienvenido <?php echo $usuarioLogin; ?></h2>
     <form class="formularioBox" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">

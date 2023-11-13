@@ -19,8 +19,25 @@ $meses = array(
     12 => 'Diciembre'
 );
 class DocumentGenerator
+
 {
-    public function generarDiferimiento($contrato, $numero_sucesivo, $ciudad, $numCedula, $fechaActual, $nombre_cliente)
+    public function crearCarpetaCliente($nombre_cliente, $fechaActual)
+    {
+        $nombreUsuario = getenv("USERNAME"); //Obtiene el nombre del usuario desde la EV 
+        $nombreCarpeta = $nombre_cliente . " " . $fechaActual;
+        $rutaCarpeta = "C:\\Users\\$nombreUsuario\\Documents\\Contratos\\$nombreCarpeta";
+        if (!is_dir($rutaCarpeta)) {
+            if (mkdir($rutaCarpeta, 0777, true)) {
+                return $rutaCarpeta;
+            } else {
+                echo "Error al crear la carpeta";
+            }
+        } else {
+            echo "La carpeta ya existe: $rutaCarpeta";
+            return $rutaCarpeta;
+        }
+    }
+    public function generarDiferimiento($contrato, $numero_sucesivo, $ciudad, $numCedula, $fechaActual, $nombre_cliente, $rutaSaveContrato)
     {
         global $meses;
         list($ano, $mes, $dia) = explode('-', $fechaActual);
@@ -34,20 +51,22 @@ class DocumentGenerator
         $templateWord->setValue('edit_numero_cedula', $numCedula);
         $templateWord->setValue('edit_fecha_contrato', $fechaFormateada);
         $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
-        $pathToSave = 'contratos/QT'.$nombre_cliente.'Diferimiento' . $numero_sucesivo . '.docx';
+        $nombreArchivo = 'QTDiferimiento'. $numero_sucesivo ." " . $nombre_cliente . '.docx';
+        $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
-    public function generarVerificacion($nombre_cliente, $numero_sucesivo, $numCedula)
+    public function generarVerificacion($nombre_cliente, $numero_sucesivo, $numCedula, $rutaSaveContrato)
     {
         $nombre_cliente = strtoupper($nombre_cliente);
         $templateWord = new TemplateProcessor("docs/VERIFICACION.docx");
         $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
         $templateWord->setValue('edit_numero_cedula', $numCedula);
-        $pathToSave = 'contratos/QT'.$nombre_cliente.'VerificacionEditado' . $numero_sucesivo . '.docx';
+        $nombreArchivo = 'QTVerificacion'. $numero_sucesivo ." " . $nombre_cliente . '.docx';
+        $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
 
-    public function generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt)
+    public function generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaSaveContrato)
     {
         $nombre_cliente = strtoupper($nombre_cliente);
         $titulo_bono = "16. BONO DE HOSPEDAJE QORY LOYALTY: ";
@@ -75,17 +94,18 @@ class DocumentGenerator
             $templateWord->setValue('edit_bono_hospedaje', "");
             $templateWord->setValue('edit_texto_bono_hospedaje', "");
         }
-        $pathToSave = 'contratos/QT'.$nombre_cliente.'Anexo3Editado' . $numero_sucesivo . '.docx';
+        $nombreArchivo = 'QTBeneficiosDeAlcance'. $numero_sucesivo ." " . $nombre_cliente . '.docx';
+        $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
 
-    public function generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPago, $email, $fechaActual, $ciudad)
+    public function generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPago, $email, $fechaActual, $ciudad, $rutaSaveContrato)
     {
-        $formasPagoS = ""; 
-        $formasPagoArray = array();       
+        $formasPagoS = "";
+        $formasPagoArray = array();
         foreach ($formasPago as $forma) {
             $formasPagoS .= $forma . "\n";
-            $formasPagoArray[] = $forma; 
+            $formasPagoArray[] = $forma;
         }
 
         global $meses;
@@ -115,10 +135,11 @@ class DocumentGenerator
         $templateWord->setValue('edit_texto_anios_contrato', $aniosContratoText);
         $templateWord->setValue('edit_monto_contrato_texto', $montoContratoText);
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
-        $pathToSave = 'contratos/QT'.$nombre_cliente.'ContratoEditado' . $numero_sucesivo . '.docx';
+        $nombreArchivo = 'QTContrato'. $numero_sucesivo ." " . $nombre_cliente . '.docx';
+        $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
-    public function generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valor_pagare, $fechaActual, $numCuotas, $montoCuotaPagare, $pagareText)
+    public function generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valor_pagare, $fechaActual, $numCuotas, $montoCuotaPagare, $pagareText, $rutaSaveContrato)
     {
         global $meses;
         list($ano, $mes, $dia) = explode('-', $fechaActual);
@@ -141,11 +162,12 @@ class DocumentGenerator
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
         $templateWord->setValue('edit_monto_cuota_pagare', $montoCuotaPagare);
         $templateWord->setValue('edit_monto_pagare', $valor_pagare);
-        $pathToSave = 'contratos/QT'.$nombre_cliente.'pagareEditado' . $numero_sucesivo . '.docx';
+        $nombreArchivo = 'QTPagare'. $numero_sucesivo ." " . $nombre_cliente . '.docx';
+        $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
 
-    public function generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala)
+    public function generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaSaveContrato)
     {
         $nombre_cliente = strtoupper($nombre_cliente);
         $ubicacionSala = strtoupper($ubicacionSala);
@@ -166,7 +188,8 @@ class DocumentGenerator
         $templateWord->setValue('edit_sala_lugar', $ubicacionSala);
         $templateWord->setValue('edit_email', $email);
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
-        $pathToSave = 'contratos/QT'.$nombre_cliente.'checkListEditado' . $numero_sucesivo . '.docx';
+        $nombreArchivo = 'QTCheckList'. $numero_sucesivo ." " . $nombre_cliente . '.docx';
+        $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
 }
