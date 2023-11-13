@@ -33,7 +33,6 @@ class DocumentGenerator
                 echo "Error al crear la carpeta";
             }
         } else {
-            echo "La carpeta ya existe: $rutaCarpeta";
             return $rutaCarpeta;
         }
     }

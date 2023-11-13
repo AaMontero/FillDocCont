@@ -128,10 +128,8 @@
     include("conexion.php");
     require 'vendor/autoload.php'; //Librería para cargar documentos de word
     $content = "";
-
-
     //Se busca dentro de la base de datos el mayor numero de contacto 
-    $consulta = "SELECT MAX(id) AS max_numero FROM contratos"; //Consulta SQL 
+    $consulta = "SELECT MAX(contrato_id) AS max_numero FROM contratos"; //Consulta SQL 
     $resultado = $conexion->query($consulta); //Se almacena lo obtenido en una variable 
     if ($resultado) {
         //Si existe el resultado se asigna un nuevo número 
@@ -160,17 +158,25 @@
         $valida = (strlen($numCedula) == 10 && strlen($nombres) > 3 && strlen($apellidos) > 3 && strlen($ciudad) > 3 && strpos($email, "@") !== false &&  strlen($ubicacionSala) > 3 && $aniosContrato != 0 && $montoContrato != 0 && strlen($provincia) > 3);
         if ($valida) {
             $cedula = $numCedula;
-            $contrato = "QT" . $ciudad;
-            $nombre_cliente = $nombres . " " . $apellidos;
-            //Cambiar
-            $insercion = "INSERT INTO contratos (ciudad, nombre, fecha, reg_usuario)    
-                VALUES ('$ciudad', '$nombre_cliente', '$fechaActual' ,'$usuarioLogin')";
-
-            if ($conexion->query($insercion) === TRUE) {
-                //echo "Contrato creado exitosamente con numero: " . $contrato;
+            $ciudad_diccionario = [
+                "Quito" => "UIO",
+                "quito" => "UIO",
+                "Guayaquil" => "GYE",
+                "guayaquil" => "GYE",
+                "santo domingo" => "STO",
+                "Santo domingo" => "STO",
+                "Santo Domingo" => "STO",
+            ];
+            if (array_key_exists($ciudad, $ciudad_diccionario)) {
+                $codigo_ciudad = $ciudad_diccionario[$ciudad];
+                $contrato = "QT" . $codigo_ciudad;
             } else {
-                echo "Error al crear el contrato: " . $conexion->error;
+                $codigo_ciudad = $ciudad;
+                $contrato = "QT" . $ciudad;
             }
+
+            $nombre_cliente = $nombres . " " . $apellidos;
+
             $okBono = isset($_POST['bono_hospedaje']);
             if ($okBono == 1) {
                 $bonoQory = true;
@@ -188,6 +194,13 @@
             $valorPagare = json_decode($_POST["pagare_monto_info"]);
             $fechaVencimiento = json_decode($_POST["pagare_fecha_info"]);
             $formasPagoString = json_decode($_POST["formas_pago"]);
+            $montoPagado = $montoContrato - $valorPagare; 
+            //Comentario y generación del Query de inserción
+            $comentario = ($valorPagare != 0) ? "Fecha Pagare: " . $fechaVencimiento : "";
+            $insercion2 = "INSERT INTO contratos (codigo, cedula, titular, valor_contrato, valor_pagado, pagare_valor, usuario, email, comentario)
+            VALUES ('$contrato', '$cedula', '$nombre_cliente', ".floatval($montoContrato).", ".floatval($montoPagado).", ".floatval($valorPagare).", '$usuarioLogin', '$email', ' Fecha del pagare  $fechaVencimiento');";
+
+            
             if ($formasPagoString == "") {
                 echo ("Inserte una forma de pago");
             } else {
@@ -206,8 +219,13 @@
                 if ($contienePagare == 1) {
                     $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valorPagare, $fechaActual, $numCuotas, $montoCuotaPagare, $pagareText, $rutaCarpetaSave);
                 }
-                $nombres = $email = $cedula= $apellidos =$ciudad =$numCedula =$provincia =$ubicacionSala = $aniosContrato = $montoContrato = "";  
-                echo("Los documentos se generaron correctamente"); 
+                $nombres = $email = $cedula = $apellidos = $ciudad = $numCedula = $provincia = $ubicacionSala = $aniosContrato = $montoContrato = "";
+                echo ("Los documentos se generaron correctamente. \n");
+                if ($conexion->query($insercion2) === TRUE) {
+                    echo "Contrato creado exitosamente con numero: " . $contrato.  $numero_sucesivo;
+                } else {
+                    echo "Error al crear el contrato: " . $conexion->error;
+                }
             }
         } else {
             $errores = array();
