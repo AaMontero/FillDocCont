@@ -142,6 +142,7 @@
     $nombres = $email = $apellidos = $ciudad = $provincia = $ubicacionSala = $cedula = $contrato = $formasPago = $pagareText = $montoCuotaPagare = "";
     $aniosContrato = $montoContrato = $numCuotas =  $valor_pagare =  0;
     $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = $contienePagare = false;
+    date_default_timezone_set('America/Guayaquil');
     $fechaActual = $fechaVencimiento = date("Y-m-d");
     // Variable para rastrear errores
     $errorNombres = $errorCedula = $errorApellidos = $errorUbicacionSala =  $errorCiudad = $errorCorreo = $erroraniosContrato = $errorMontoContrato = $errorProvincia = "";
