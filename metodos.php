@@ -50,7 +50,7 @@ class DocumentGenerator
         $templateWord->setValue('edit_numero_cedula', $numCedula);
         $templateWord->setValue('edit_fecha_contrato', $fechaFormateada);
         $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
-        $nombreArchivo = 'QTDiferimiento'. $numero_sucesivo ." " . $nombre_cliente . '.docx';
+        $nombreArchivo = 'QTDiferimiento' . $numero_sucesivo . " " . $nombre_cliente . '.docx';
         $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
@@ -60,17 +60,22 @@ class DocumentGenerator
         $templateWord = new TemplateProcessor("docs/VERIFICACION.docx");
         $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
         $templateWord->setValue('edit_numero_cedula', $numCedula);
-        $nombreArchivo = 'QTVerificacion'. $numero_sucesivo ." " . $nombre_cliente . '.docx';
+        $nombreArchivo = 'QTVerificacion' . $numero_sucesivo . " " . $nombre_cliente . '.docx';
         $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
 
-    public function generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaSaveContrato)
+    public function generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaSaveContrato, $clausulaCD)
     {
         $nombre_cliente = strtoupper($nombre_cliente);
         $titulo_bono = "16. BONO DE HOSPEDAJE QORY LOYALTY: ";
         $texto_bono = "Acepto y recibo UN Bono de Hospedaje 3 Noches 2 Días para 06 personas. Previo pago de Impuestos. Uso exclusivo en departamentos de la compañía. No incluye ningún tipo de alimentación";
         $titulo_bonoInt = "17. BONO DE HOSPEDAJE INTERNACIONAL QORY LOYALTY: ";
+        if ($clausulaCD) {
+            $clausulaCD = "Los beneficios se habilitarán conforme al contrato de programa turístico suscrito y al reglamento interno de QORIT TRAVEL AGENCY S.A.";
+        }else{
+            $clausulaCD =""; 
+        }
         $texto_bonoInt = "Acepto y recibo Un Bono de Hospedaje 4 Noches 5 Días para 05 personas. Previo pago de Impuestos, si incluye alimentación. PREVIA RESERVA. Destino: Cancún - México";
         $templateWord = new TemplateProcessor("docs/ANEXO 3 BENEFICIOS ALCANCE DE LA OFERTA.docx");
         $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
@@ -93,7 +98,7 @@ class DocumentGenerator
             $templateWord->setValue('edit_bono_hospedaje', "");
             $templateWord->setValue('edit_texto_bono_hospedaje', "");
         }
-        $nombreArchivo = 'QTBeneficiosDeAlcance'. $numero_sucesivo ." " . $nombre_cliente . '.docx';
+        $nombreArchivo = 'QTBeneficiosDeAlcance' . $numero_sucesivo . " " . $nombre_cliente . '.docx';
         $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
@@ -134,7 +139,7 @@ class DocumentGenerator
         $templateWord->setValue('edit_texto_anios_contrato', $aniosContratoText);
         $templateWord->setValue('edit_monto_contrato_texto', $montoContratoText);
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
-        $nombreArchivo = 'QTContrato'. $numero_sucesivo ." " . $nombre_cliente . '.docx';
+        $nombreArchivo = 'QTContrato' . $numero_sucesivo . " " . $nombre_cliente . '.docx';
         $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
@@ -161,17 +166,18 @@ class DocumentGenerator
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
         $templateWord->setValue('edit_monto_cuota_pagare', $montoCuotaPagare);
         $templateWord->setValue('edit_monto_pagare', $valor_pagare);
-        $nombreArchivo = 'QTPagare'. $numero_sucesivo ." " . $nombre_cliente . '.docx';
+        $nombreArchivo = 'QTPagare' . $numero_sucesivo . " " . $nombre_cliente . '.docx';
         $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
 
-    public function generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaSaveContrato)
+    public function generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaSaveContrato, $anexo2Texto)
     {
         $nombre_cliente = strtoupper($nombre_cliente);
         $ubicacionSala = strtoupper($ubicacionSala);
         $ciudadMayu = strtoupper($ciudad);
         $ciudad = ucwords($ciudad);
+        $anexo2Texto = strtoupper($anexo2Texto);
         global $meses;
         list($ano, $mes, $dia) = explode('-', $fechaActual);
         $fechaFormateada = $dia . " de " . $meses[intval($mes)] . " del " . $ano;
@@ -187,7 +193,8 @@ class DocumentGenerator
         $templateWord->setValue('edit_sala_lugar', $ubicacionSala);
         $templateWord->setValue('edit_email', $email);
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
-        $nombreArchivo = 'QTCheckList'. $numero_sucesivo ." " . $nombre_cliente . '.docx';
+        $templateWord->setValue('edit_anexo2', $anexo2Texto);
+        $nombreArchivo = 'QTCheckList' . $numero_sucesivo . " " . $nombre_cliente . '.docx';
         $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
