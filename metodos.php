@@ -105,17 +105,16 @@ class DocumentGenerator
             echo ("Llega a 36");
         }
         for ($i = 1; $i <= $numCuotas; $i++) {
-            $templateWord->setValue('edit_saldo_prev_{$i}', $listaFechasPagare[$i - 1]["saldo_restante"]);
-            $templateWord->setValue('edit_fecha_pago_{$i}', $listaFechasPagare[$i - 1]["fecha"]);
-            $templateWord->setValue('edit_cuotas_rest_{$i}', $listaFechasPagare[$i - 1]["num_cuota"]);
-            $templateWord->setValue('edit_pago_mensual_{$i}', $listaFechasPagare[$i - 1]["monto"]);
-            $templateWord->setValue('edit_pago_final_{$i}', $listaFechasPagare[$i - 1]["saldo_post_pago"]);
-
-            echo ("Esta llegando casi al final");
-            $nombreArchivo = 'QTPagare' . $numero_sucesivo . " " . $nombre_cliente . '.docx';
-            $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
-            $templateWord->saveAs($pathToSave);
+            $templateWord->setValue("edit_saldo_prev_{$i}", $listaFechasPagare[$i - 1]["saldo_restante"]);
+            $templateWord->setValue("edit_fecha_pago_{$i}", $listaFechasPagare[$i - 1]["fecha"]);
+            $templateWord->setValue("edit_cuotas_rest_{$i}", $listaFechasPagare[$i - 1]["num_cuota"]);
+            $templateWord->setValue("edit_pago_mensual_{$i}", $listaFechasPagare[$i - 1]["monto"]);
+            $templateWord->setValue("edit_pago_final_{$i}", $listaFechasPagare[$i - 1]["saldo_post_pago"]);
         }
+        echo ("Esta llegando casi al final");
+        $nombreArchivo = 'QTPagareCreditos' . $numero_sucesivo . " " . $nombre_cliente . '.docx';
+        $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
+        $templateWord->saveAs($pathToSave);
     }
     public function generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaSaveContrato, $clausulaCD)
     {

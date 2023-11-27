@@ -289,6 +289,7 @@
                     $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaCarpetaSave, "Débito Automatico");
                     $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaCarpetaSave, false);
                     $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad, $rutaCarpetaSave);
+                    echo(gettype($fechaInicioCredDir));
                     $funciones->generarPagaresCredito($fechaInicioCredDir, $montoCredDir, $numCuotasCredDir,$rutaCarpetaSave,$numero_sucesivo,$nombre_cliente)  ;
                 }
                 if ($contienePagare == 1) {
