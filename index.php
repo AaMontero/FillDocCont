@@ -15,6 +15,7 @@
     <script>
         var listaFormasPago = [];
         var pagareBoolean = false;
+        var creditoDirectoBoolean = false;
 
         function functionAgregar() {
             event.preventDefault();
@@ -37,20 +38,19 @@
         }
 
         function functionAgregarPagare() {
-            if (pagareBoolean == true) {
+            if (pagareBoolean == true || creditoDirectoBoolean == true) {
                 alert("Ya se agrego un Pagaré previamente");
             } else {
                 event.preventDefault();
                 const valor = document.getElementById("valor_pagare");
                 const fecha = document.getElementById("fecha_pago_pagare");
-                const cuotas = document.getElementById("n_cuotas_pagare");
+    
                 const valorValue = valor.value;
                 const fechaValue = fecha.value;
-                const cuotasValue = cuotas.value;
-                if (valorValue === "" || fechaValue === "" || cuotasValue === "") {
+                if (valorValue === "" || fechaValue === "") {
                     alert("Por favor, complete todos los campos antes de agregar el Pagaré.");
                 } else {
-                    document.getElementById("pagare_cuotas_info").value = JSON.stringify(cuotasValue);
+                    ;
                     document.getElementById("pagare_monto_info").value = JSON.stringify(valorValue);
                     document.getElementById("pagare_fecha_info").value = JSON.stringify(fechaValue);
                     var cadena = "$" + valorValue + " con Pagaré Fecha: " + fechaValue;
@@ -59,7 +59,7 @@
                     listaFormasPago.forEach((element) => console.log(element));
                     valor.value = "";
                     fecha.value = "";
-                    cuotas.value = "";
+                    
                     document.getElementById("formas_pago").value = JSON.stringify(listaFormasPago);
                     document.getElementById("contiene_pagare").value = "true";
                     pagareBoolean = true;
@@ -71,27 +71,41 @@
 
         function functionAgregarCreditoDirecto() {
             event.preventDefault();
-            const creditoDirectoValor = document.getElementById("monto_credito_directo");
-            const creditoDirectoFecha = document.getElementById("fecha_inicio_cred_dir");
-            const creditoDirectoNumCuotas = document.getElementById("meses_credito_directo");
-            const creditoDirectoAbono = document.getElementById("abono_credito_directo");
-            const CDValor = creditoDirectoValor.value;
-            const CDFechaIni = creditoDirectoFecha.value;
-            const CDNumCuotas = creditoDirectoNumCuotas.value;
-            const CDAbono = creditoDirectoAbono.value;
-            console.log(CDValor, CDFechaIni, CDNumCuotas, CDAbono);
-            if (CDValor == "" || CDFechaIni == "" || CDNumCuotas == "") {
-                alert("Por favor complete todos los campos del Credito Directo");
+
+            if (pagareBoolean == true || creditoDirectoBoolean == true) {
+                alert("Ya se ha agregado otra forma de pago");
             } else {
-                document.getElementById("cred_dir_fecha_inicio").value = JSON.stringify(CDFechaIni);
-                document.getElementById("cred_dir_num_cuotas").value = JSON.stringify(CDNumCuotas);
-                document.getElementById("cred_dir_valor").value = JSON.stringify(CDValor);
-                document.getElementById("cred_dir_abono").value = JSON.stringify(CDAbono);
-                listaFormasPago.push("Se inserto un Credito Directo");
-                document.getElementById("contiene_credito_directo").value = "true";
-                document.getElementById("formas_pago").value = JSON.stringify(listaFormasPago);
-                alert("Se agrego un Credito Directo");
+                const creditoDirectoValor = document.getElementById("monto_credito_directo");
+                const creditoDirectoFecha = document.getElementById("fecha_inicio_cred_dir");
+                const creditoDirectoNumCuotas = document.getElementById("meses_credito_directo");
+                const creditoDirectoAbono = document.getElementById("abono_credito_directo");
+                const CDValor = creditoDirectoValor.value;
+                const CDFechaIni = creditoDirectoFecha.value;
+                const CDNumCuotas = creditoDirectoNumCuotas.value;
+                const CDAbono = creditoDirectoAbono.value;
+                console.log(CDValor, CDFechaIni, CDNumCuotas, CDAbono);
+                if (CDValor == "" || CDFechaIni == "" || CDNumCuotas == "") {
+                    alert("Por favor complete todos los campos del Credito Directo");
+                } else {
+                    document.getElementById("cred_dir_fecha_inicio").value = JSON.stringify(CDFechaIni);
+                    document.getElementById("cred_dir_num_cuotas").value = JSON.stringify(CDNumCuotas);
+                    document.getElementById("cred_dir_valor").value = JSON.stringify(CDValor);
+                    document.getElementById("cred_dir_abono").value = JSON.stringify(CDAbono);
+                    listaFormasPago.push("Se inserto un Credito Directo");
+                    document.getElementById("contiene_credito_directo").value = "true";
+                    document.getElementById("formas_pago").value = JSON.stringify(listaFormasPago);
+                    creditoDirectoValor.value = "";
+                    creditoDirectoFecha.value = "";
+                    creditoDirectoNumCuotas.value = "";
+                    creditoDirectoAbono.value = "";
+                    alert("Se agrego un Credito Directo");
+                    creditoDirectoBoolean = true;
+                }
             }
+
+            console.log(pagareBoolean);
+            console.log(creditoDirectoBoolean);
+
 
         }
         document.addEventListener("DOMContentLoaded", function() {
@@ -166,7 +180,12 @@
     // CreditoDirecto - pago mensual -> edit_pago_mensual_1
     // CreditoDirecto - Saldo a la fecha -> edit_saldo_fecha_1
     // CheckList Anexo 2-> edit_anexo2
-    // Anexo  3 clausula CD -> edit_clausula_CD
+    // Anexo  3 clausula CD -> edit_beneficios_alcance
+    // Abono CD -> edit_abono_CD 
+    // Abono CD letras -> edit_abono_letras_CD
+    // Num cuotas CD -> edit_num_coutas_CD
+    // Monto cuota CD -> edit_monto_cuota_CD
+    // Monto cuota CD letras -> edit_monto_cuota_letas_CD
 
     use PhpOffice\PhpWord\TemplateProcessor;
 
@@ -181,7 +200,6 @@
         //Si existe el resultado se asigna un nuevo número 
         $fila = $resultado->fetch_assoc();
         $numero_sucesivo = $fila['max_numero'] + 1;
-        echo ($numero_sucesivo);
     } else {
         $numero_sucesivo = 1; // Si no hay contratos en la base de datos
         echo ("no esta entrando dentro del if");
@@ -204,6 +222,8 @@
         $ubicacionSala = test_input($_POST["ubicacion_sala"]);
         $aniosContrato = test_input($_POST["anios_contrato"]);
         $montoContrato = test_input($_POST["monto_contrato"]);
+        $contienePagare = (json_decode($_POST["contiene_pagare"]) == "true");
+        $contieneCreditoDirecto = (json_decode($_POST["contiene_credito_directo"]) == "true");
         $valida = (strlen($numCedula) == 10 && strlen($nombres) > 3 && strlen($apellidos) > 3 && strlen($ciudad) > 3 && strpos($email, "@") !== false &&  strlen($ubicacionSala) > 3 && $aniosContrato != 0 && $montoContrato != 0 && strlen($provincia) > 3);
         if ($valida) {
             $cedula = $numCedula;
@@ -218,14 +238,14 @@
             ];
             if (array_key_exists($ciudad, $ciudad_diccionario)) {
                 $codigo_ciudad = $ciudad_diccionario[$ciudad];
-                if ($contieneCreditoDirecto) {
+                if ($contieneCreditoDirecto == 1) {
                     $contrato = "CD_QT" . $codigo_ciudad;
                 } else {
                     $contrato = "QT" . $codigo_ciudad;
                 }
             } else {
                 $codigo_ciudad = $ciudad;
-                if ($contieneCreditoDirecto) {
+                if ($contieneCreditoDirecto == 1) {
                     $contrato = "CD_QT" . $codigo_ciudad;
                 } else {
                     $contrato = "QT" . $codigo_ciudad;
@@ -247,7 +267,7 @@
                 $bonoQoryInt = false;
             }
             //Adquirir valores pasados desde JS 
-            $numCuotas = json_decode($_POST["pagare_cuotas_info"]);
+            
             $valorPagare = json_decode($_POST["pagare_monto_info"]);
             $fechaVencimiento = json_decode($_POST["pagare_fecha_info"]);
             $formasPagoString = json_decode($_POST["formas_pago"]);
@@ -255,15 +275,13 @@
             $numCuotasCredDir = json_decode($_POST["cred_dir_num_cuotas"]);
             $montoCredDir = json_decode($_POST["cred_dir_valor"]);
             $abonoCredDir = json_decode($_POST["cred_dir_abono"]);
-            echo ($fechaInicioCredDir);
-            echo ($numCuotasCredDir);
-            echo ($montoCredDir);
-            echo ($abonoCredDir);
+            if ($abonoCredDir == "") {
+                $abonoCredDir = 0;
+            }
             $montoPagado = $montoContrato - $valorPagare;
             //Comentario y generación del Query de inserción
             $comentario = ($valorPagare != 0) ? "Fecha Pagare: " . $fechaVencimiento : "";
-            $insercion2 = "INSERT INTO contratos (contrato_id, codigo, cedula, titular, valor_contrato, valor_pagado, pagare_valor, usuario, email, comentario)
-            VALUES ($numero_sucesivo, '$contrato', '$cedula', '$nombre_cliente', " . floatval($montoContrato) . ", " . floatval($montoPagado) . ", " . floatval($valorPagare) . ", '$usuarioLogin', '$email', ' Fecha del pagare  $fechaVencimiento');";
+
 
 
             if ($formasPagoString == "") {
@@ -272,40 +290,55 @@
                 foreach ($formasPagoString as $forma) {
                     $formasPago = $formasPago . $forma . "\n \n";
                 }
-                $contienePagare = (json_decode($_POST["contiene_pagare"]) == "true");
-                $contieneCreditoDirecto = (json_decode($_POST["contiene_credito_directo"]) == "true");
                 $funciones = new DocumentGenerator();
                 $rutaCarpetaSave = $funciones->crearCarpetaCliente($nombre_cliente, $fechaActual);
-                //echo($rutaCarpetaSave); 
                 $funciones->generarVerificacion($nombre_cliente, $numero_sucesivo, $numCedula, $rutaCarpetaSave);
                 $funciones->generarDiferimiento($contrato, $numero_sucesivo, $ciudad, $numCedula, $fechaActual, $nombre_cliente, $rutaCarpetaSave);
-                if ($contieneCreditoDirecto != 1 && $contienepagare != 1) {
+                if ($contieneCreditoDirecto != 1 && $contienePagare != 1) {
                     $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad, $rutaCarpetaSave);
-                    $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaCarpetaSave, true);
+                    $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaCarpetaSave, false);
                     $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaCarpetaSave, "Descuento para pagos con tarjeta");
+                    $insercion2 = "INSERT INTO contratos (contrato_id, codigo, cedula, titular, valor_contrato, valor_pagado, pagare_valor, usuario, email, comentario)
+            VALUES ($numero_sucesivo, '$contrato', '$cedula', '$nombre_cliente', " . floatval($montoContrato) . ", " . floatval($montoPagado) . ", " . floatval($valorPagare) . ", '$usuarioLogin', '$email', '');";
+                    if ($conexion->query($insercion2) === TRUE) {
+                        echo "Contrato creado exitosamente con numero: " . $contrato .  $numero_sucesivo;
+                    } else {
+                        echo "Error al crear el contrato: " . $conexion->error;
+                    }
                 }
                 if ($contieneCreditoDirecto == 1) {
-                    
+                    $valorPendiente = ($montoCredDir - $abonoCredDir);
+                    $resultado =  $valorPendiente / $numCuotasCredDir;
+                    $valorCuota = ceil($resultado * 100) / 100;
+                    $valorCuota = number_format($valorCuota, 2);
                     $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaCarpetaSave, "Débito Automatico");
-                    $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaCarpetaSave, false);
-                    $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad, $rutaCarpetaSave);
-                    echo(gettype($fechaInicioCredDir));
-                    $funciones->generarPagaresCredito($fechaInicioCredDir, $montoCredDir, $numCuotasCredDir,$rutaCarpetaSave,$numero_sucesivo,$nombre_cliente)  ;
+                    $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaCarpetaSave, true);
+                    $funciones->generarContratoCreditoDirecto($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad, $rutaCarpetaSave, $abonoCredDir, $numCuotasCredDir, $valorCuota);
+                    $funciones->generarPagaresCredito($fechaInicioCredDir, $montoCredDir, $abonoCredDir, $numCuotasCredDir, $rutaCarpetaSave, $numero_sucesivo, $nombre_cliente, $ciudad, $numCedula, $fechaActual, $email);
+                    $insercionCredDir = "INSERT INTO contratos (contrato_id, codigo, cedula, titular, valor_contrato, valor_pagado, pagare_valor, usuario, email, comentario)
+            VALUES ($numero_sucesivo, '$contrato', '$cedula', '$nombre_cliente', " . floatval($montoContrato) . ", " . floatval($abonoCredDir) . ", " . floatval($valorPendiente) . ", '$usuarioLogin', '$email', ' Fecha del pagare  $fechaInicioCredDir');";
+                    if ($conexion->query($insercionCredDir) === TRUE) {
+                        echo "Contrato creado exitosamente con numero: " . $contrato .  $numero_sucesivo;
+                    } else {
+                        echo "Error al crear el contrato: " . $conexion->error;
+                    }
                 }
                 if ($contienePagare == 1) {
-                    
+
                     $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad, $rutaCarpetaSave);
-                    $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaCarpetaSave, true);
+                    $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaCarpetaSave, false);
                     $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaCarpetaSave, "Descuento para pagos con tarjeta");
-                    $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valorPagare, $fechaActual, $numCuotas, $montoCuotaPagare, $pagareText, $rutaCarpetaSave);
+                    $funciones->generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valorPagare, $fechaActual, 1, $montoCuotaPagare, $pagareText, $rutaCarpetaSave);
+                    $insercionPagare = "INSERT INTO contratos (contrato_id, codigo, cedula, titular, valor_contrato, valor_pagado, pagare_valor, usuario, email, comentario)
+            VALUES ($numero_sucesivo, '$contrato', '$cedula', '$nombre_cliente', " . floatval($montoContrato) . ", " . floatval($montoPagado) . ", " . floatval($valorPagare) . ", '$usuarioLogin', '$email', ' Fecha del pagare  $fechaVencimiento');";
+                    if ($conexion->query($insercionPagare) === TRUE) {
+                        echo "Contrato creado exitosamente con numero: " . $contrato .  $numero_sucesivo;
+                    } else {
+                        echo "Error al crear el contrato: " . $conexion->error;
+                    }
                 }
                 $nombres = $email = $cedula = $apellidos = $ciudad = $numCedula = $provincia = $ubicacionSala = $aniosContrato = $montoContrato = "";
                 echo ("Los documentos se generaron correctamente. \n");
-                if ($conexion->query($insercion2) === TRUE) {
-                    echo "Contrato creado exitosamente con numero: " . $contrato .  $numero_sucesivo;
-                } else {
-                    echo "Error al crear el contrato: " . $conexion->error;
-                }
             }
         } else {
             $errores = array();
@@ -353,11 +386,9 @@
         <h2>Bienvenido <?php echo $usuarioLogin; ?></h2>
         <!-- Hidden -->
         <input type="hidden" id="formas_pago" name="formas_pago">
-        <input type="hidden" id="pagare_cuotas_info" name="pagare_cuotas_info">
         <input type="hidden" id="pagare_monto_info" name="pagare_monto_info">
         <input type="hidden" id="pagare_fecha_info" name="pagare_fecha_info">
         <input type="hidden" id="contiene_pagare" name="contiene_pagare">
-
         <input type="hidden" id="contiene_credito_directo" name="contiene_credito_directo">
         <input type="hidden" id="cred_dir_fecha_inicio" name="cred_dir_fecha_inicio">
         <input type="hidden" id="cred_dir_num_cuotas" name="cred_dir_num_cuotas">
@@ -443,8 +474,6 @@
         <div id="divPagareCheckbox" style="display:none ; margin-top:10px ; margin-bottom: 5px">
             <label for="valor" style="margin-right:10px">Valor:</label>
             <input type="number" id="valor_pagare" name="valor_pagare" placeholder="Ingrese el valor" style="margin-right:10px">
-            <label for="n_cuotas" style="margin-right:10px">N° Cuotas:</label>
-            <input type="number" id="n_cuotas_pagare" name="n_cuotas_pagare" placeholder="Num de Cuotas" style="margin-right:10px">
             <label for="fechaPago" style="margin-right:10px">Fecha de Pago:</label>
             <input type="date" id="fecha_pago_pagare" name="fechaPago" style="margin-right:10px">
             <button onclick="functionAgregarPagare()">+</button>

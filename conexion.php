@@ -6,8 +6,8 @@ $contrasena = "contraseniadb";
 $base_datos = "travelqori_contratos";
 
 // Conexión
-$conexion = new mysqli("localhost","root","","contratosdb");
-//$conexion = new mysqli($servidor,$usuario, $contrasena, $base_datos);
+//$conexion = new mysqli("localhost","root","","contratosdb");
+$conexion = new mysqli($servidor,$usuario, $contrasena, $base_datos);
 
 //Establecer la conexión con la base de datos. 
 if ($conexion->connect_error) {

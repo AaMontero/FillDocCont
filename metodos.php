@@ -64,15 +64,13 @@ class DocumentGenerator
         $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
-    public function generarFechasPagare($fecha_inicial, $valor, $numCuotas)
+    public function generarFechasPagare($fecha_inicial, $valor,$abono, $numCuotas)
     {
-        // Convertir la fecha inicial a un objeto DateTime
         $fecha = new DateTime($fecha_inicial);
-        // Calcular el monto de cada cuota
-        $monto_cuota = number_format($valor / $numCuotas, 2);
-        // Inicializar un array para almacenar las fechas, montos, saldos y número de cuotas
+        
+        $valor = $valor-$abono; 
+        $monto_cuota = number_format(($valor) / $numCuotas, 2);
         $resultados = array();
-        // Generar las fechas, montos, saldos y número de cuotas para cada cuota
         for ($i = 0; $i < $numCuotas; $i++) {
             $saldo_restante = number_format($valor - ($i * $monto_cuota), 2);
             $resultados[] = array(
@@ -82,27 +80,37 @@ class DocumentGenerator
                 'num_cuota' => $i + 1,
                 'saldo_post_pago' => number_format($valor - (($i + 1) * $monto_cuota), 2)
             );
-            // Añadir un mes para la siguiente cuota
             $fecha->add(new DateInterval('P1M'));
+        }
+        if($resultados[$numCuotas-1]['saldo_post_pago']!=0){         
+            $resultados[$numCuotas-1]['saldo_post_pago'] = 0 ; 
+            $resultados[$numCuotas-1]['monto'] = number_format($valor-(($numCuotas-1)*$monto_cuota), 2) ; 
         }
         return $resultados;
     }
-    public function generarPagaresCredito($fechaInicio, $monto, $numCuotas, $rutaSaveContrato, $numero_sucesivo, $nombre_cliente)
+    public function generarPagaresCredito($fechaInicio, $monto,$abono, $numCuotas, $rutaSaveContrato, $numero_sucesivo, $nombre_cliente, $ciudad, $numCedula, $fechaActual, $email)
     {
+        global $meses;
+        list($ano, $mes, $dia) = explode('-', $fechaActual);
+        $nombre_cliente = strtoupper($nombre_cliente);
+        $ciudadMayu = strtoupper($ciudad);
+        $ciudad = ucwords($ciudad);
+        $numCedula = strtoupper($numCedula);
+        $fmt = new NumberFormatter('es', NumberFormatter::SPELLOUT);
+        $montoSaldoPrevText = $fmt->format($monto);
+        $montoSaldoPrevText = strtoupper($montoSaldoPrevText);
+        $fechaFormateada = $dia . " días del mes de " . $meses[intval($mes)] . " de " . $ano;
         if ($numCuotas == 12) {
             $templateWord = new TemplateProcessor("docs/PAGARÉ CREDITO DIRECTO 12.docx");
-            $listaFechasPagare = $this->generarFechasPagare($fechaInicio, $monto, $numCuotas);
-            echo ("Llega a 12");
+            $listaFechasPagare = $this->generarFechasPagare($fechaInicio, $monto,$abono, $numCuotas);
         }
         if ($numCuotas == 24) {
             $templateWord = new TemplateProcessor("docs/PAGARÉ CREDITO DIRECTO 24.docx");
-            $listaFechasPagare = $this->generarFechasPagare($fechaInicio, $monto, $numCuotas);
-            echo ("Llega a 24");
+            $listaFechasPagare = $this->generarFechasPagare($fechaInicio, $monto,$abono, $numCuotas);
         }
         if ($numCuotas == 36) {
             $templateWord = new TemplateProcessor("docs/PAGARÉ CREDITO DIRECTO 36.docx");
-            $listaFechasPagare = $this->generarFechasPagare($fechaInicio, $monto, $numCuotas);
-            echo ("Llega a 36");
+            $listaFechasPagare = $this->generarFechasPagare($fechaInicio, $monto,$abono, $numCuotas);
         }
         for ($i = 1; $i <= $numCuotas; $i++) {
             $templateWord->setValue("edit_saldo_prev_{$i}", $listaFechasPagare[$i - 1]["saldo_restante"]);
@@ -111,21 +119,29 @@ class DocumentGenerator
             $templateWord->setValue("edit_pago_mensual_{$i}", $listaFechasPagare[$i - 1]["monto"]);
             $templateWord->setValue("edit_pago_final_{$i}", $listaFechasPagare[$i - 1]["saldo_post_pago"]);
         }
-        echo ("Esta llegando casi al final");
+        $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
+        $templateWord->setValue('edit_numero_cedula', $numCedula);
+        $templateWord->setValue('edit_ciudad', $ciudad);
+        $templateWord->setValue('edit_ciudad_mayu', $ciudadMayu);
+        $templateWord->setValue('edit_saldo_prev_1_text', $montoSaldoPrevText);
+        $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
+        $templateWord->setValue('edit_email', $email); 
+        $templateWord->setValue('edit_monto_contrato', $monto);
+
+        
         $nombreArchivo = 'QTPagareCreditos' . $numero_sucesivo . " " . $nombre_cliente . '.docx';
         $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
-    public function generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaSaveContrato, $clausulaCD)
+    public function generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaSaveContrato, $clausulaCDBoolean)
     {
         $nombre_cliente = strtoupper($nombre_cliente);
         $titulo_bono = "16. BONO DE HOSPEDAJE QORY LOYALTY: ";
-        $texto_bono = "Acepto y recibo UN Bono de Hospedaje 3 Noches 2 Días para 06 personas. Previo pago de Impuestos. Uso exclusivo en departamentos de la compañía. No incluye ningún tipo de alimentación";
+        $texto_bono = "Acepto y recibo UN Bono de Hospedaje 3 Días 2 Noches para 06 personas. Previo pago de Impuestos. Uso exclusivo en departamentos de la compañía. No incluye ningún tipo de alimentación";
         $titulo_bonoInt = "17. BONO DE HOSPEDAJE INTERNACIONAL QORY LOYALTY: ";
-        if ($clausulaCD) {
+        $clausulaCD = "";
+        if ($clausulaCDBoolean) {
             $clausulaCD = "Los beneficios se habilitarán conforme al contrato de programa turístico suscrito y al reglamento interno de QORIT TRAVEL AGENCY S.A.";
-        } else {
-            $clausulaCD = "";
         }
         $texto_bonoInt = "Acepto y recibo Un Bono de Hospedaje 4 Noches 5 Días para 05 personas. Previo pago de Impuestos, si incluye alimentación. PREVIA RESERVA. Destino: Cancún - México";
         $templateWord = new TemplateProcessor("docs/ANEXO 3 BENEFICIOS ALCANCE DE LA OFERTA.docx");
@@ -133,6 +149,7 @@ class DocumentGenerator
         $templateWord->setValue('edit_contrato_id', $contrato);
         $templateWord->setValue('edit_numero_cedula', $numCedula);
         $templateWord->setValue('edit_num_cliente', $numero_sucesivo);
+        $templateWord->setValue('edit_beneficios_alcance', $clausulaCD);
         if ($bonoQory && !$bonoQoryInt) {
             $templateWord->setValue('edit_bono_hospedaje', $titulo_bono);
             $templateWord->setValue('edit_texto_bono_hospedaje', $texto_bono);
@@ -194,6 +211,48 @@ class DocumentGenerator
         $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
+
+    public function generarContratoCreditoDirecto($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPago, $email, $fechaActual, $ciudad, $rutaSaveContrato, $abonoCD, $numCuotasCD, $valorCuotaCD)
+    {
+        global $meses;
+        list($ano, $mes, $dia) = explode('-', $fechaActual);
+
+        $nombre_cliente = strtoupper($nombre_cliente);
+        $fmt = new NumberFormatter('es', NumberFormatter::SPELLOUT);
+        $montoContratoText = $fmt->format($montoContrato);
+        $aniosContratoText = $fmt->format($aniosContrato);
+        $abonoContratoText = $fmt->format($abonoCD);
+        $valorCuotaDolares = floor($valorCuotaCD);
+        $valorCentavosDolares = round(($valorCuotaCD - $valorCuotaDolares) * 100);
+        $valorCuotaDolaresText = $fmt->format($valorCuotaDolares);
+        $valorCentavosDolaresText = $fmt->format($valorCentavosDolares);
+        $cuotaValorContratoText = $valorCuotaDolaresText . " con " . $valorCentavosDolaresText;
+        $aniosContratoText = strtoupper($aniosContratoText);
+        $montoContratoText = strtoupper($montoContratoText);
+        $abonoContratoText = strtoupper($abonoContratoText);
+        $cuotaValorContratoText = strtoupper($cuotaValorContratoText);
+        $fechaFormateada = $dia . " días del mes de " . $meses[intval($mes)] . ", año " . $ano;
+        $templateWord = new TemplateProcessor("docs/Contrato de agencia de viajes_QORIT CD.docx");
+        $templateWord->setValue('edit_nombres_apellidos', $nombre_cliente);
+        $templateWord->setValue('edit_contrato_id', $contrato);
+        $templateWord->setValue('edit_num_cliente', $numero_sucesivo);
+        $templateWord->setValue('edit_numero_cedula', $numCedula);
+        $templateWord->setValue('edit_monto_contrato', $montoContrato);
+        $templateWord->setValue('edit_anios_contrato', $aniosContrato);
+        $templateWord->setValue('edit_email', $email);
+        $templateWord->setValue('edit_ciudad', $ciudad);
+        $templateWord->setValue('edit_texto_anios_contrato', $aniosContratoText);
+        $templateWord->setValue('edit_monto_contrato_texto', $montoContratoText);
+        $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
+        $templateWord->setValue('edit_abono_CD', $abonoCD);
+        $templateWord->setValue('edit_abono_letras_CD', $abonoContratoText);
+        $templateWord->setValue('edit_num_coutas_CD', $numCuotasCD);
+        $templateWord->setValue('edit_monto_cuota_CD', $valorCuotaCD);
+        $templateWord->setValue('edit_monto_cuota_letas_CD', $cuotaValorContratoText);
+        $nombreArchivo = 'QTContratoCD' . $numero_sucesivo . " " . $nombre_cliente . '.docx';
+        $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
+        $templateWord->saveAs($pathToSave);
+    }
     public function generarPagare($nombre_cliente, $numCedula, $numero_sucesivo, $fechaVencimiento, $ciudad, $email, $valor_pagare, $fechaActual, $numCuotas, $montoCuotaPagare, $pagareText, $rutaSaveContrato)
     {
         global $meses;
@@ -222,14 +281,18 @@ class DocumentGenerator
         $templateWord->saveAs($pathToSave);
     }
 
-    public function generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaSaveContrato, $anexo2Texto)
+    public function generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaSaveContrato, $credDirBoolean)
     {
         $nombre_cliente = strtoupper($nombre_cliente);
         $ubicacionSala = strtoupper($ubicacionSala);
         $ciudadMayu = strtoupper($ciudad);
         $ciudad = ucwords($ciudad);
-        $anexo2Texto = strtoupper($anexo2Texto);
         global $meses;
+        $textoAnexo2 =  "PARA PAGOS CON TARJETA";
+        if ($credDirBoolean) {
+            $textoAnexo2 = "Debito Automatico";
+        }
+        $textoAnexo2 = strtoupper($textoAnexo2);
         list($ano, $mes, $dia) = explode('-', $fechaActual);
         $fechaFormateada = $dia . " de " . $meses[intval($mes)] . " del " . $ano;
         $templateWord = new TemplateProcessor("docs/CHECK LIST QORIT.docx");
@@ -244,7 +307,7 @@ class DocumentGenerator
         $templateWord->setValue('edit_sala_lugar', $ubicacionSala);
         $templateWord->setValue('edit_email', $email);
         $templateWord->setValue('edit_fecha_texto', $fechaFormateada);
-        $templateWord->setValue('edit_anexo2', $anexo2Texto);
+        $templateWord->setValue('edit_anexo2_CD', $textoAnexo2);
         $nombreArchivo = 'QTCheckList' . $numero_sucesivo . " " . $nombre_cliente . '.docx';
         $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
