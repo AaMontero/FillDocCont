@@ -64,7 +64,59 @@ class DocumentGenerator
         $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
         $templateWord->saveAs($pathToSave);
     }
+    public function generarFechasPagare($fecha_inicial, $valor, $numCuotas)
+    {
+        // Convertir la fecha inicial a un objeto DateTime
+        $fecha = new DateTime($fecha_inicial);
+        // Calcular el monto de cada cuota
+        $monto_cuota = number_format($valor / $numCuotas, 2);
+        // Inicializar un array para almacenar las fechas, montos, saldos y número de cuotas
+        $resultados = array();
+        // Generar las fechas, montos, saldos y número de cuotas para cada cuota
+        for ($i = 0; $i < $numCuotas; $i++) {
+            $saldo_restante = number_format($valor - ($i * $monto_cuota), 2);
+            $resultados[] = array(
+                'fecha' => $fecha->format('Y-m-d'),
+                'monto' => $monto_cuota,
+                'saldo_restante' => $saldo_restante,
+                'num_cuota' => $i + 1,
+                'saldo_post_pago' => number_format($valor - (($i + 1) * $monto_cuota), 2)
+            );
+            // Añadir un mes para la siguiente cuota
+            $fecha->add(new DateInterval('P1M'));
+        }
+        return $resultados;
+    }
+    public function generarPagaresCredito($fechaInicio, $monto, $numCuotas, $rutaSaveContrato, $numero_sucesivo, $nombre_cliente)
+    {
+        if ($numCuotas == 12) {
+            $templateWord = new TemplateProcessor("docs/PAGARÉ CREDITO DIRECTO 12.docx");
+            $listaFechasPagare = $this->generarFechasPagare($fechaInicio, $monto, $numCuotas);
+            echo ("Llega a 12");
+        }
+        if ($numCuotas == 24) {
+            $templateWord = new TemplateProcessor("docs/PAGARÉ CREDITO DIRECTO 24.docx");
+            $listaFechasPagare = $this->generarFechasPagare($fechaInicio, $monto, $numCuotas);
+            echo ("Llega a 24");
+        }
+        if ($numCuotas == 36) {
+            $templateWord = new TemplateProcessor("docs/PAGARÉ CREDITO DIRECTO 36.docx");
+            $listaFechasPagare = $this->generarFechasPagare($fechaInicio, $monto, $numCuotas);
+            echo ("Llega a 36");
+        }
+        for ($i = 1; $i <= $numCuotas; $i++) {
+            $templateWord->setValue('edit_saldo_prev_{$i}', $listaFechasPagare[$i - 1]["saldo_restante"]);
+            $templateWord->setValue('edit_fecha_pago_{$i}', $listaFechasPagare[$i - 1]["fecha"]);
+            $templateWord->setValue('edit_cuotas_rest_{$i}', $listaFechasPagare[$i - 1]["num_cuota"]);
+            $templateWord->setValue('edit_pago_mensual_{$i}', $listaFechasPagare[$i - 1]["monto"]);
+            $templateWord->setValue('edit_pago_final_{$i}', $listaFechasPagare[$i - 1]["saldo_post_pago"]);
 
+            echo ("Esta llegando casi al final");
+            $nombreArchivo = 'QTPagare' . $numero_sucesivo . " " . $nombre_cliente . '.docx';
+            $pathToSave = $rutaSaveContrato . '\\' . $nombreArchivo;
+            $templateWord->saveAs($pathToSave);
+        }
+    }
     public function generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaSaveContrato, $clausulaCD)
     {
         $nombre_cliente = strtoupper($nombre_cliente);
@@ -73,8 +125,8 @@ class DocumentGenerator
         $titulo_bonoInt = "17. BONO DE HOSPEDAJE INTERNACIONAL QORY LOYALTY: ";
         if ($clausulaCD) {
             $clausulaCD = "Los beneficios se habilitarán conforme al contrato de programa turístico suscrito y al reglamento interno de QORIT TRAVEL AGENCY S.A.";
-        }else{
-            $clausulaCD =""; 
+        } else {
+            $clausulaCD = "";
         }
         $texto_bonoInt = "Acepto y recibo Un Bono de Hospedaje 4 Noches 5 Días para 05 personas. Previo pago de Impuestos, si incluye alimentación. PREVIA RESERVA. Destino: Cancún - México";
         $templateWord = new TemplateProcessor("docs/ANEXO 3 BENEFICIOS ALCANCE DE LA OFERTA.docx");

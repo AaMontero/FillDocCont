@@ -70,7 +70,7 @@
         }
 
         function functionAgregarCreditoDirecto() {
-
+            event.preventDefault();
             const creditoDirectoValor = document.getElementById("monto_credito_directo");
             const creditoDirectoFecha = document.getElementById("fecha_inicio_cred_dir");
             const creditoDirectoNumCuotas = document.getElementById("meses_credito_directo");
@@ -90,7 +90,6 @@
                 listaFormasPago.push("Se inserto un Credito Directo");
                 document.getElementById("contiene_credito_directo").value = "true";
                 document.getElementById("formas_pago").value = JSON.stringify(listaFormasPago);
-
                 alert("Se agrego un Credito Directo");
             }
 
@@ -192,7 +191,7 @@
     $aniosContrato = $montoContrato = $numCuotas =  $valor_pagare =  0;
     $bonoQory = $bonoQoryInt = $pagareBoolean = $otroFormaPagoBoolean = $contienePagare = $contieneCreditoDirecto =  false;
     date_default_timezone_set('America/Guayaquil');
-    $fechaActual = $fechaVencimiento = date("Y-m-d");
+    $fechaActual = $fechaVencimiento = $fechaInicioCredDir = date("Y-m-d");
     // Variable para rastrear errores
     $errorNombres = $errorCedula = $errorApellidos = $errorUbicacionSala =  $errorCiudad = $errorCorreo = $erroraniosContrato = $errorMontoContrato = $errorProvincia = "";
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -286,11 +285,14 @@
                     $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaCarpetaSave, "Descuento para pagos con tarjeta");
                 }
                 if ($contieneCreditoDirecto == 1) {
+                    
                     $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaCarpetaSave, "Débito Automatico");
                     $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaCarpetaSave, false);
                     $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad, $rutaCarpetaSave);
+                    $funciones->generarPagaresCredito($fechaInicioCredDir, $montoCredDir, $numCuotasCredDir,$rutaCarpetaSave,$numero_sucesivo,$nombre_cliente)  ;
                 }
                 if ($contienePagare == 1) {
+                    
                     $funciones->generarContrato($contrato, $nombre_cliente, $numero_sucesivo, $numCedula, $montoContrato, $aniosContrato, $formasPagoString, $email, $fechaActual, $ciudad, $rutaCarpetaSave);
                     $funciones->generarBeneficiosAlcance($contrato, $numero_sucesivo, $nombre_cliente, $numCedula, $bonoQory, $bonoQoryInt, $rutaCarpetaSave, true);
                     $funciones->generarCheckList($contrato, $numero_sucesivo, $ciudad, $provincia,  $numCedula, $email, $fechaActual, $nombre_cliente, $ubicacionSala, $rutaCarpetaSave, "Descuento para pagos con tarjeta");
